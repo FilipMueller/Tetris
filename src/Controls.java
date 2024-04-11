@@ -1,14 +1,7 @@
-import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class WindowGame {
-
-    private static final int WIDTH = 445, HEIGHT = 630;
-
-    private JFrame window;
-
-    private Board board;
+public class Controls {
 
     private KeyListener keyListener = new KeyListener() {
         @Override
@@ -34,20 +27,14 @@ public class WindowGame {
         }
     };
 
-    public WindowGame() {
-        window = new JFrame("Tetris");
-        window.setSize(WIDTH, HEIGHT);
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setResizable(false);
-        window.setLocationRelativeTo(null);
-        board = new Board();
-        window.addKeyListener(keyListener);
-        window.add(board);
-        window.setVisible(true);
+    public void moveShape() {
+
 
     }
 
-     public static void main(String[] args) {
-        new WindowGame();
+
+    public Controls() {
+
+
     }
 }
