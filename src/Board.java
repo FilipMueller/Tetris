@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 public class Board  extends JPanel {
 
@@ -22,22 +23,33 @@ public class Board  extends JPanel {
         looper = new Timer(500, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                moveShape(currentShape);
+                currentShape.moveShapeDown();
                 repaint();
             }
         });
         looper.start();
     }
 
-    public void moveShape(Shape s) {
-        for (int i = 0; i < s.squareMatrix.length; i++) {
-            for (int j = 0; j < s.squareMatrix[0].length; j++) {
-                if (s.squareMatrix[i][j] != null) {
-                    s.squareMatrix[i][j].setY(s.squareMatrix[i][j].getY() + BLOCK_SIZE);
-                }
+    public KeyListener keyListener = new KeyListener() {
+        @Override
+        public void keyTyped(KeyEvent e) {
+        }
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                currentShape.moveShapeLeft();
+            }
+            if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                currentShape.moveShapeRight();
+            }
+            if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+                currentShape.moveShapeDown();
             }
         }
-    }
+        @Override
+        public void keyReleased(KeyEvent e) {
+        }
+    };
 
     @Override
     protected void paintComponent(Graphics g) {

@@ -8,31 +8,10 @@ public class WindowGame {
 
     private JFrame window;
 
-    private Board board;
+    final private Board board;
 
-    private KeyListener keyListener = new KeyListener() {
-        @Override
-        public void keyTyped(KeyEvent e) {
-        }
-        @Override
-        public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_UP) {
-                System.out.println("UP");
-            }
-            if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                System.out.println("LEFT");
-            }
-            if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                System.out.println("RIGHT");
-            }
-            if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-                System.out.println("DOWN");
-            }
-        }
-        @Override
-        public void keyReleased(KeyEvent e) {
-        }
-    };
+    private Controls controls;
+
 
     public WindowGame() {
         window = new JFrame("Tetris");
@@ -41,7 +20,7 @@ public class WindowGame {
         window.setResizable(false);
         window.setLocationRelativeTo(null);
         board = new Board();
-        window.addKeyListener(keyListener);
+        window.addKeyListener(board.keyListener);
         window.add(board);
         window.setVisible(true);
 

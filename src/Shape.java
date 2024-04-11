@@ -4,7 +4,7 @@ public class Shape {
 
     Square[][] squareMatrix;
 
-    private boolean shapeFirstSpawn = true;
+    private boolean shapeInitialSpawn = true;
 
     private static final int BLOCK_SIZE = 30;
 
@@ -38,18 +38,48 @@ public class Shape {
             for (int col = 0; col < squareMatrix[0].length; col++) {
                 if (squareMatrix[row][col].color != null) {
                     g.setColor(squareMatrix[row][col].color);
-                    if (shapeFirstSpawn) {
+                    if (shapeInitialSpawn) {
                         squareMatrix[row][col].setX(row * BLOCK_SIZE + 120);
                         squareMatrix[row][col].setY(col * BLOCK_SIZE);
                         g.fillRect(row * BLOCK_SIZE + 120, col * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
                     }
-                    if (!shapeFirstSpawn) {
+                    if (!shapeInitialSpawn) {
                         g.fillRect(squareMatrix[row][col].getX(), squareMatrix[row][col].getY(), BLOCK_SIZE, BLOCK_SIZE);
                     }
                 }
             }
         }
-        shapeFirstSpawn = false;
+        shapeInitialSpawn = false;
+    }
+
+    public void moveShapeDown() {
+        for (int i = 0; i < squareMatrix.length; i++) {
+            for (int j = 0; j < squareMatrix[0].length; j++) {
+                if (squareMatrix[i][j] != null) {
+                    squareMatrix[i][j].setY(squareMatrix[i][j].getY() + BLOCK_SIZE);
+                }
+            }
+        }
+    }
+
+    public void moveShapeLeft() {
+        for (int i = 0; i < squareMatrix.length; i++) {
+            for (int j = 0; j < squareMatrix[0].length; j++) {
+                if (squareMatrix[i][j] != null) {
+                    squareMatrix[i][j].setX(squareMatrix[i][j].getX() - BLOCK_SIZE);
+                }
+            }
+        }
+    }
+
+    public void moveShapeRight() {
+        for (int i = 0; i < squareMatrix.length; i++) {
+            for (int j = 0; j < squareMatrix[0].length; j++) {
+                if (squareMatrix[i][j] != null) {
+                    squareMatrix[i][j].setX(squareMatrix[i][j].getX() + BLOCK_SIZE);
+                }
+            }
+        }
     }
 
     private Square[][] shapeI = {
