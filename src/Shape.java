@@ -33,7 +33,7 @@ public class Shape {
         }
     }
 
-    public void drawShape(Graphics g) {
+    public void draw(Graphics g) {
         for (int row = 0; row < squareMatrix.length; row++) {
             for (int col = 0; col < squareMatrix[0].length; col++) {
                 if (squareMatrix[row][col].color != null) {
@@ -52,7 +52,7 @@ public class Shape {
         shapeInitialSpawn = false;
     }
 
-    public void moveShapeDown() {
+    public void moveDown() {
         for (int i = 0; i < squareMatrix.length; i++) {
             for (int j = 0; j < squareMatrix[0].length; j++) {
                 if (squareMatrix[i][j] != null) {
@@ -62,7 +62,7 @@ public class Shape {
         }
     }
 
-    public void moveShapeLeft() {
+    public void moveLeft() {
         for (int i = 0; i < squareMatrix.length; i++) {
             for (int j = 0; j < squareMatrix[0].length; j++) {
                 if (squareMatrix[i][j] != null) {
@@ -72,7 +72,7 @@ public class Shape {
         }
     }
 
-    public void moveShapeRight() {
+    public void moveRight() {
         for (int i = 0; i < squareMatrix.length; i++) {
             for (int j = 0; j < squareMatrix[0].length; j++) {
                 if (squareMatrix[i][j] != null) {

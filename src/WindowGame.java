@@ -20,7 +20,7 @@ public class WindowGame {
         window.setResizable(false);
         window.setLocationRelativeTo(null);
         board = new Board();
-        window.addKeyListener(board.keyListener);
+        window.addKeyListener(board);
         window.add(board);
         window.setVisible(true);
 

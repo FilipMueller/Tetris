@@ -5,7 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class Board  extends JPanel {
+public class Board  extends JPanel implements KeyListener {
 
     private static final int BOARD_WIDTH = 10;
 
@@ -15,41 +15,32 @@ public class Board  extends JPanel {
 
     private static final int BLOCK_SIZE = 30;
 
+    private static int FPS = 60;
+
+    private static int delay = 1000 / FPS;
+
+    private int delayTimeForMovement = 600;
+
+    private long beginTime;
+
     Shape currentShape = new Shape();
 
     private Timer looper;
 
     public Board() {
-        looper = new Timer(500, new ActionListener() {
+        looper = new Timer(delay, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                currentShape.moveShapeDown();
+                if (System.currentTimeMillis() - beginTime > delayTimeForMovement) {
+                    System.out.println(System.currentTimeMillis());
+                    currentShape.moveDown();
+                    beginTime = System.currentTimeMillis();
+                }
                 repaint();
             }
         });
         looper.start();
     }
-
-    public KeyListener keyListener = new KeyListener() {
-        @Override
-        public void keyTyped(KeyEvent e) {
-        }
-        @Override
-        public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                currentShape.moveShapeLeft();
-            }
-            if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                currentShape.moveShapeRight();
-            }
-            if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-                currentShape.moveShapeDown();
-            }
-        }
-        @Override
-        public void keyReleased(KeyEvent e) {
-        }
-    };
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -57,7 +48,7 @@ public class Board  extends JPanel {
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, getWidth(), getHeight());
 
-        currentShape.drawShape(g);
+        currentShape.draw(g);
 
         g.setColor(Color.WHITE);
         for (int row = 0; row < BOARD_HEIGHT; row++) {
@@ -67,5 +58,38 @@ public class Board  extends JPanel {
         for (int column = 0; column < BOARD_WIDTH + 1; column++) {
             g.drawLine(column * BLOCK_SIZE, 0, column * BLOCK_SIZE, BLOCK_SIZE * BOARD_HEIGHT);
         }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+            currentShape.moveLeft();
+        }
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+            currentShape.moveRight();
+        }
+        if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+            delayTimeForMovement = 50;
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+            delayTimeForMovement = 600;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+            delayTimeForMovement = 600;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+            delayTimeForMovement = 600;
+        }
+
+
     }
 }
