@@ -2,10 +2,9 @@ import java.awt.*;
 
 public class Square {
 
-    int x;
-    int y;
-    static final int BLOCK_SIZE = 30;
-    Color color;
+    private int x;
+    private int y;
+    private final Color color;
 
     public Square(Color color) {
         this.color = color;
@@ -25,5 +24,9 @@ public class Square {
 
     public int getY() {
         return y;
+    }
+
+    public Color getColor() {
+        return color;
     }
 }

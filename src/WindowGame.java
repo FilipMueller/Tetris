@@ -1,17 +1,12 @@
 import javax.swing.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 public class WindowGame {
 
-    private static final int WIDTH = 445, HEIGHT = 630;
+    public static final int WIDTH = 445, HEIGHT = 639;
 
     private JFrame window;
 
     final private Board board;
-
-    private Controls controls;
-
 
     public WindowGame() {
         window = new JFrame("Tetris");
@@ -19,6 +14,7 @@ public class WindowGame {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setResizable(false);
         window.setLocationRelativeTo(null);
+
         board = new Board();
         window.addKeyListener(board);
         window.add(board);
