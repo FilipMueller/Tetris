@@ -29,4 +29,5 @@ public class Square {
     public Color getColor() {
         return color;
     }
+
 }

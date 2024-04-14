@@ -2,13 +2,15 @@ import java.awt.*;
 
 public class Shape {
 
-    private final Square[][] squareMatrix;
+    final Square[][] squareMatrix;
 
     private boolean initialSpawn = true;
 
     private static final int BLOCK_SIZE = 30;
 
     private static final int BOARD_BOTTOM = 570;
+
+    private int[] floor = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     public Shape() {
         int random = (int) (Math.random() * 7);
@@ -63,7 +65,6 @@ public class Shape {
                     if (initialSpawn) {
                         squareMatrix[row][col].setX(row * BLOCK_SIZE + 120);
                         squareMatrix[row][col].setY(col * BLOCK_SIZE);
-                        g.fillRect(row * BLOCK_SIZE + 120, col * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
                     }
                     if (!initialSpawn) {
                         g.fillRect(squareMatrix[row][col].getX(), squareMatrix[row][col].getY(), BLOCK_SIZE, BLOCK_SIZE);
@@ -75,7 +76,6 @@ public class Shape {
     }
 
     public void spin() {
-
 
     }
 
@@ -107,17 +107,18 @@ public class Shape {
         return furthest;
     }
 
-    public boolean atBottom() {
+    public int getLowestY() {
+        int lowest = 1000;
         for (int i = 0; i < squareMatrix.length; i++) {
             for (int j = 0; j < squareMatrix[0].length; j++) {
                 if (squareMatrix[i][j].getColor() != null) {
-                    if (squareMatrix[i][j].getY() == BOARD_BOTTOM) {
-                        return true;
+                    if (squareMatrix[i][j].getY() < lowest) {
+                        lowest = squareMatrix[i][j].getY();
                     }
                 }
             }
         }
-        return false;
+        return lowest;
     }
 
     public void moveDown() {

@@ -26,20 +26,25 @@ public class Board  extends JPanel implements KeyListener {
 
     private static final int FAST = 50;
 
+    private int boardBottom = 570;
+
     private int delayTimeForMovement = NORMAL;
 
     private long beginTime;
 
     private final ArrayList<Shape> oldShapes = new ArrayList<>();
 
+    private Square[] floor = new Square[BOARD_WIDTH];
+
     Shape currentShape = new Shape();
 
     public Board() {
+        floorSquares(floor);
         Timer looper = new Timer(delay, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (System.currentTimeMillis() - beginTime > delayTimeForMovement) {
-                    if (!currentShape.atBottom()) currentShape.moveDown();
+                    if (!atBottom()) currentShape.moveDown();
                     beginTime = System.currentTimeMillis();
                 }
                 repaint();
@@ -48,13 +53,25 @@ public class Board  extends JPanel implements KeyListener {
         looper.start();
     }
 
+    public static void floorSquares(Square[] squares) {
+        int x = 30;
+        for (int i = 0; i < 10; i++) {
+            squares[i] = new Square(null);
+            squares[i].setX(x);
+            squares[i].setY(570);
+            x += 30;
+        }
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, getWidth(), getHeight());
 
-        if (currentShape.atBottom()) {
+        if (atBottom()) {
+            //UPDATE FLOORHEIGHTS
+            updateBottom();
             oldShapes.add(currentShape);
             currentShape = new Shape();
         }
@@ -76,6 +93,47 @@ public class Board  extends JPanel implements KeyListener {
         }
     }
 
+    public void updateBottom() {
+        for (int i = 0; i < currentShape.squareMatrix.length; i++) {
+            int lowest = 1000;
+            for (int j = 0; j < currentShape.squareMatrix[0].length; j++) {
+                if (currentShape.squareMatrix[i][j].getColor() != null) {
+                    if (currentShape.squareMatrix[i][j].getY() < lowest) {
+                        lowest = currentShape.squareMatrix[i][j].getY();
+                        for (int k = 0; k < 10; k++) {
+                            if (floor[k].getX() == currentShape.squareMatrix[i][j].getX()) {
+                                floor[k].setY(lowest);
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public int findY(int x) {
+        for (int k = 0; k < 10; k++) {
+            if (floor[k].getX() == x) {
+                return floor[k].getY();
+            }
+        }
+        return -1;
+    }
+
+    public boolean atBottom() {
+        for (int i = 0; i < currentShape.squareMatrix.length; i++) {
+            for (int j = 0; j < currentShape.squareMatrix[0].length; j++) {
+                if (currentShape.squareMatrix[i][j].getColor() != null) {
+                    if (currentShape.squareMatrix[i][j].getY() == findY(currentShape.squareMatrix[i][j].getX())){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
 
 
 
@@ -92,7 +150,7 @@ public class Board  extends JPanel implements KeyListener {
         if (e.getKeyCode() == KeyEvent.VK_RIGHT && currentShape.furthestRight() <= BOARD_RIGHT_WALL) {
             currentShape.moveRight();
         }
-        if (e.getKeyCode() == KeyEvent.VK_DOWN && !currentShape.atBottom()) {
+        if (e.getKeyCode() == KeyEvent.VK_DOWN && !atBottom()) {
             delayTimeForMovement = FAST;
         }
     }

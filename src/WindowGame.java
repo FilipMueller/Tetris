@@ -4,9 +4,9 @@ public class WindowGame {
 
     public static final int WIDTH = 445, HEIGHT = 639;
 
-    private JFrame window;
+    private final JFrame window;
 
-    final private Board board;
+    private final Board board;
 
     public WindowGame() {
         window = new JFrame("Tetris");
