@@ -26,8 +26,6 @@ public class Board  extends JPanel implements KeyListener {
 
     private static final int FAST = 50;
 
-    private int boardBottom = 570;
-
     private int delayTimeForMovement = NORMAL;
 
     private long beginTime;
@@ -54,7 +52,7 @@ public class Board  extends JPanel implements KeyListener {
     }
 
     public static void floorSquares(Square[] squares) {
-        int x = 30;
+        int x = 0;
         for (int i = 0; i < 10; i++) {
             squares[i] = new Square(null);
             squares[i].setX(x);
@@ -70,7 +68,6 @@ public class Board  extends JPanel implements KeyListener {
         g.fillRect(0, 0, getWidth(), getHeight());
 
         if (atBottom()) {
-            //UPDATE FLOORHEIGHTS
             updateBottom();
             oldShapes.add(currentShape);
             currentShape = new Shape();
@@ -102,9 +99,8 @@ public class Board  extends JPanel implements KeyListener {
                         lowest = currentShape.squareMatrix[i][j].getY();
                         for (int k = 0; k < 10; k++) {
                             if (floor[k].getX() == currentShape.squareMatrix[i][j].getX()) {
-                                floor[k].setY(lowest);
+                                floor[k].setY(lowest - 30);
                             }
-
                         }
                     }
                 }

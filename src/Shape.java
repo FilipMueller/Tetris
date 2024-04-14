@@ -8,10 +8,6 @@ public class Shape {
 
     private static final int BLOCK_SIZE = 30;
 
-    private static final int BOARD_BOTTOM = 570;
-
-    private int[] floor = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
     public Shape() {
         int random = (int) (Math.random() * 7);
         if (random == 0) {
@@ -105,20 +101,6 @@ public class Shape {
             }
         }
         return furthest;
-    }
-
-    public int getLowestY() {
-        int lowest = 1000;
-        for (int i = 0; i < squareMatrix.length; i++) {
-            for (int j = 0; j < squareMatrix[0].length; j++) {
-                if (squareMatrix[i][j].getColor() != null) {
-                    if (squareMatrix[i][j].getY() < lowest) {
-                        lowest = squareMatrix[i][j].getY();
-                    }
-                }
-            }
-        }
-        return lowest;
     }
 
     public void moveDown() {
