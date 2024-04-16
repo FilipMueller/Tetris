@@ -59,11 +59,11 @@ public class Shape {
                 if (squareMatrix[row][col].getColor() != null) {
                     g.setColor(squareMatrix[row][col].getColor());
                     if (initialSpawn) {
-                        squareMatrix[row][col].setX(row * BLOCK_SIZE + 120);
-                        squareMatrix[row][col].setY(col * BLOCK_SIZE);
+                        squareMatrix[row][col].setX(row + 4);
+                        squareMatrix[row][col].setY(col);
                     }
                     if (!initialSpawn) {
-                        g.fillRect(squareMatrix[row][col].getX(), squareMatrix[row][col].getY(), BLOCK_SIZE, BLOCK_SIZE);
+                        g.fillRect(squareMatrix[row][col].getX() * BLOCK_SIZE, squareMatrix[row][col].getY() * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
                     }
                 }
             }
@@ -75,39 +75,11 @@ public class Shape {
 
     }
 
-    public int furthestLeft() {
-        int furthest = 1000;
-        for (int i = 0; i < squareMatrix.length; i++) {
-            for (int j = 0; j < squareMatrix[0].length; j++) {
-                if (squareMatrix[i][j].getColor() != null) {
-                    if (furthest > squareMatrix[i][j].getX()) {
-                        furthest = squareMatrix[i][j].getX();
-                    }
-                }
-            }
-        }
-        return furthest;
-    }
-
-    public int furthestRight() {
-        int furthest = 0;
-        for (int i = 0; i < squareMatrix.length; i++) {
-            for (int j = 0; j < squareMatrix[0].length; j++) {
-                if (squareMatrix[i][j].getColor() != null) {
-                    if (furthest < squareMatrix[i][j].getX()) {
-                        furthest = squareMatrix[i][j].getX();
-                    }
-                }
-            }
-        }
-        return furthest;
-    }
-
     public void moveDown() {
         for (int i = 0; i < squareMatrix.length; i++) {
             for (int j = 0; j < squareMatrix[0].length; j++) {
                 if (squareMatrix[i][j] != null) {
-                    squareMatrix[i][j].setY(squareMatrix[i][j].getY() + BLOCK_SIZE);
+                    squareMatrix[i][j].setY(squareMatrix[i][j].getY() + 1);
                 }
             }
         }
@@ -117,7 +89,7 @@ public class Shape {
         for (int i = 0; i < squareMatrix.length; i++) {
             for (int j = 0; j < squareMatrix[0].length; j++) {
                 if (squareMatrix[i][j] != null) {
-                    squareMatrix[i][j].setX(squareMatrix[i][j].getX() - BLOCK_SIZE);
+                    squareMatrix[i][j].setX(squareMatrix[i][j].getX() - 1);
                 }
             }
         }
@@ -127,7 +99,7 @@ public class Shape {
         for (int i = 0; i < squareMatrix.length; i++) {
             for (int j = 0; j < squareMatrix[0].length; j++) {
                 if (squareMatrix[i][j] != null) {
-                    squareMatrix[i][j].setX(squareMatrix[i][j].getX() + BLOCK_SIZE);
+                    squareMatrix[i][j].setX(squareMatrix[i][j].getX() + 1);
                 }
             }
         }

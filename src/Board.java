@@ -1,7 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -18,15 +16,9 @@ public class Board  extends JPanel implements KeyListener {
 
     private static final int delay = 1000 / FPS;
 
-    private static final int BOARD_LEFT_WALL = 30;
-
-    private static final int BOARD_RIGHT_WALL = 240;
-
     private static final int NORMAL = 600;
 
     private static final int FAST = 50;
-
-    private static final int BOARD_BOTTOM = 570;
 
     private int delayTimeForMovement = NORMAL;
 
@@ -34,35 +26,19 @@ public class Board  extends JPanel implements KeyListener {
 
     private final ArrayList<Shape> oldShapes = new ArrayList<>();
 
-    private Square[] floor = new Square[BOARD_WIDTH];
-
-    private Square[][] board = new Square[BOARD_WIDTH][BOARD_HEIGHT];
+    private final Square[][] board = new Square[BOARD_HEIGHT][BOARD_WIDTH];
 
     Shape currentShape = new Shape();
 
     public Board() {
-        floorSquares(floor);
-        Timer looper = new Timer(delay, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (System.currentTimeMillis() - beginTime > delayTimeForMovement) {
-                    if (!atBottom()) currentShape.moveDown();
-                    beginTime = System.currentTimeMillis();
-                }
-                repaint();
+        Timer looper = new Timer(delay, _ -> {
+            if (System.currentTimeMillis() - beginTime > delayTimeForMovement) {
+                if (!checkIfHasNeighbour(2)) currentShape.moveDown();
+                beginTime = System.currentTimeMillis();
             }
+            repaint();
         });
         looper.start();
-    }
-
-    public static void floorSquares(Square[] squares) {
-        int x = 0;
-        for (int i = 0; i < 10; i++) {
-            squares[i] = new Square(null);
-            squares[i].setX(x);
-            squares[i].setY(570);
-            x += 30;
-        }
     }
 
     @Override
@@ -71,8 +47,8 @@ public class Board  extends JPanel implements KeyListener {
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, getWidth(), getHeight());
 
-        if (atBottom()) {
-            updateBottom();
+        if (checkIfHasNeighbour(2)) {
+            fillArray();
             oldShapes.add(currentShape);
             currentShape = new Shape();
         }
@@ -94,39 +70,30 @@ public class Board  extends JPanel implements KeyListener {
         }
     }
 
-    public void updateBottom() {
-        for (int i = 0; i < currentShape.squareMatrix.length; i++) {
-            int lowest = 1000;
-            for (int j = 0; j < currentShape.squareMatrix[0].length; j++) {
-                if (currentShape.squareMatrix[i][j].getColor() != null) {
-                    if (currentShape.squareMatrix[i][j].getY() < lowest) {
-                        lowest = currentShape.squareMatrix[i][j].getY();
-                        for (int k = 0; k < 10; k++) {
-                            if (floor[k].getX() == currentShape.squareMatrix[i][j].getX()) {
-                                floor[k].setY(lowest - 30);
+    public boolean checkIfHasNeighbour(int direction) {
+        for (Square[] squareArray : currentShape.squareMatrix) {
+            for (Square square : squareArray) {
+                if (square.getColor() != null) {
+                    int x = square.getX();
+                    int y = square.getY();
+                    switch (direction) {
+                        case 0: //check left
+                            if (square.getX() >= 9 || board[square.getY()][square.getX() + 1] != null) {
+                                return true;
                             }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public int findY(int x) {
-        for (int k = 0; k < 10; k++) {
-            if (floor[k].getX() == x) {
-                return floor[k].getY();
-            }
-        }
-        return -1;
-    }
-
-    public boolean atBottom() {
-        for (int i = 0; i < currentShape.squareMatrix.length; i++) {
-            for (int j = 0; j < currentShape.squareMatrix[0].length; j++) {
-                if (currentShape.squareMatrix[i][j].getColor() != null) {
-                    if (currentShape.squareMatrix[i][j].getY() == findY(currentShape.squareMatrix[i][j].getX()) || currentShape.squareMatrix[i][j].getY() == BOARD_BOTTOM){
-                        return true;
+                            break;
+                        case 1: //check right
+                            if (x == 0 || board[y][x - 1] != null) {
+                                return true;
+                            }
+                            break;
+                        case 2: //check bottom
+                            if (y == board.length - 1 || board[y + 1][x] != null) {
+                                return true;
+                            }
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Invalid dircetion");
                     }
                 }
             }
@@ -134,38 +101,19 @@ public class Board  extends JPanel implements KeyListener {
         return false;
     }
 
-    public boolean findSquareNeighbour(int y) {
-        for (Shape shape : oldShapes) {
-            for (int i = 0; i < shape.squareMatrix.length; i++) {
-                for (int j = 0; j < shape.squareMatrix[0].length; j++) {
-                    if (shape.squareMatrix[i][j].getColor() != null) {
-                        for (int k = 0; k < currentShape.squareMatrix.length; k++) {
-                            for (int z = 0; z < currentShape.squareMatrix[0].length; z++) {
-                                if (currentShape.squareMatrix[k][z].getColor() != null) {
-                                    if (y == -1) {
-                                        if ((currentShape.squareMatrix[k][z].getX() == shape.squareMatrix[i][j].getX() && currentShape.squareMatrix[k][z].getY() == shape.squareMatrix[i][j].getY())) {
-                                            return true;
-                                        }
-                                    } else if (y == 1) {
-                                        if (currentShape.squareMatrix[k][z].getX() == shape.squareMatrix[i][j].getX() && currentShape.squareMatrix[k][z].getY() == shape.squareMatrix[i][j].getY()) {
-                                            return true;
-                                        }
-                                    } else {
-                                        if (currentShape.squareMatrix[k][z].getY() == shape.squareMatrix[i][j].getY()) {
-                                            return true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+    public void fillArray() {
+        for (Square[] squareArray : currentShape.squareMatrix) {
+            for (Square square : squareArray) {
+                int x = square.getX();
+                int y = square.getY();
+                if (square.getColor() != null) {
+                    board[y][x] = new Square(square.getColor());
+                    board[y][x].setX(x);
+                    board[y][x].setY(y);
                 }
             }
         }
-        return false;
     }
-
-
 
 
     @Override
@@ -175,13 +123,13 @@ public class Board  extends JPanel implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_LEFT && currentShape.furthestLeft() >= BOARD_LEFT_WALL && !findSquareNeighbour(-1)) {
+        if (e.getKeyCode() == KeyEvent.VK_LEFT && (!checkIfHasNeighbour(1))) {
             currentShape.moveLeft();
         }
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT && currentShape.furthestRight() <= BOARD_RIGHT_WALL && !findSquareNeighbour(1)) {
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT && (!checkIfHasNeighbour(0))) {
             currentShape.moveRight();
         }
-        if (e.getKeyCode() == KeyEvent.VK_DOWN && !findSquareNeighbour(0)) {
+        if (e.getKeyCode() == KeyEvent.VK_DOWN && !checkIfHasNeighbour(2)) {
             delayTimeForMovement = FAST;
         }
     }
