@@ -53,12 +53,8 @@ public class Board  extends JPanel implements KeyListener {
             currentShape = new Shape();
         }
 
-        if (!oldShapes.isEmpty()) {
-            for (Shape s : oldShapes) {
-                s.draw(g);
-            }
-        }
-
+        checkIfRowIsFilled();
+        drawBoard(g);
         currentShape.draw(g);
 
         g.setColor(Color.WHITE);
@@ -67,6 +63,48 @@ public class Board  extends JPanel implements KeyListener {
         }
         for (int column = 0; column < BOARD_WIDTH + 1; column++) {
             g.drawLine(column * BLOCK_SIZE, 0, column * BLOCK_SIZE, BLOCK_SIZE * BOARD_HEIGHT);
+        }
+    }
+
+    public void checkIfRowIsFilled() {
+        int rowNumber = 0;
+        for (Square[] squareArray : board) {
+            int filledSquares = 0;
+            for (Square square : squareArray) {
+                if (square != null) {
+                    filledSquares++;
+                }
+            }
+            if (filledSquares == 10) {
+                emptyFilledRow(rowNumber);
+            }
+            rowNumber++;
+        }
+    }
+
+    public void emptyFilledRow(int rowNumber) {
+        for (int i = 0; i < 10; i++) {
+            board[rowNumber][i] = null;
+        }
+
+        for (int i = rowNumber - 1; i >= 0; i--) {
+            for (int j = 0; j < 10; j++) {
+                if (board[i][j] != null) {
+                    board[i][j].setY(board[i][j].getY() + 1);
+                }
+            }
+        }
+    }
+
+
+    public void drawBoard(Graphics g) {
+        for (int row = 0; row < board.length; row++) {
+            for (int col = 0; col < board[0].length; col++) {
+                if (board[row][col] != null) {
+                    g.setColor(board[row][col].getColor());
+                    g.fillRect(board[row][col].getX() * BLOCK_SIZE, board[row][col].getY() * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                }
+            }
         }
     }
 
