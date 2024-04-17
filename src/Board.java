@@ -90,7 +90,10 @@ public class Board  extends JPanel implements KeyListener {
         for (int i = rowNumber - 1; i >= 0; i--) {
             for (int j = 0; j < 10; j++) {
                 if (board[i][j] != null) {
-                    board[i][j].setY(board[i][j].getY() + 1);
+                    board[i + 1][j] = new Square(board[i][j].getColor());
+                    board[i + 1][j].setX(board[i][j].getX());
+                    board[i + 1][j].setY(board[i][j].getY() + 1);
+                    board[i][j] = null;
                 }
             }
         }
