@@ -24,8 +24,6 @@ public class Board  extends JPanel implements KeyListener {
 
     private long beginTime;
 
-    private final ArrayList<Shape> oldShapes = new ArrayList<>();
-
     private final Square[][] board = new Square[BOARD_HEIGHT][BOARD_WIDTH];
 
     Shape currentShape = new Shape();
@@ -49,7 +47,6 @@ public class Board  extends JPanel implements KeyListener {
 
         if (checkIfHasNeighbour(2)) {
             fillArray();
-            oldShapes.add(currentShape);
             currentShape = new Shape();
         }
 
@@ -164,6 +161,9 @@ public class Board  extends JPanel implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_UP) {
+            currentShape.rotate();
+        }
         if (e.getKeyCode() == KeyEvent.VK_LEFT && (!checkIfHasNeighbour(1))) {
             currentShape.moveLeft();
         }
