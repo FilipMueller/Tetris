@@ -10,9 +10,9 @@ public class Shape {
 
     private String centerPoint;
 
-    private final int[] xRotation = {0, 1};
+    private final int[] xRotationClockwise = {0, 1};
 
-    private final int[] yRotation = {-1, 0};
+    private final int[] yRotationClockwise = {-1, 0};
 
     public Shape() {
         int random = (int) (Math.random() * 7);
@@ -96,11 +96,19 @@ public class Shape {
                     int x = squareMatrix[i][j].getX() - centerX;
                     int y = squareMatrix[i][j].getY() - centerY;
 
-                    int newX = (xRotation[0] * x) + (xRotation[1] * y);
-                    int newY = (yRotation[0] * x) + (yRotation[1] * y);
 
-                    squareMatrix[i][j].setX(newX + centerX);
-                    squareMatrix[i][j].setY(newY + centerY);
+                    int newX = (xRotationClockwise[0] * x) + (xRotationClockwise[1] * y);
+                    int newY = (yRotationClockwise[0] * x) + (yRotationClockwise[1] * y);
+
+
+                    int controlX = newX + centerX;
+
+                    //2 schleifen oder 2 arrays
+
+                    if (controlX < 10 && controlX > 0) {
+                        squareMatrix[i][j].setX(newX + centerX);
+                        squareMatrix[i][j].setY(newY + centerY);
+                    }
                 }
             }
         }
