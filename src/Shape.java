@@ -10,9 +10,9 @@ public class Shape {
 
     private String centerPoint;
 
-    private final int[] xRotationClockwise = {0, 1};
+    private final int[] xRotationCounterClockwise = {0, 1};
 
-    private final int[] yRotationClockwise = {-1, 0};
+    private final int[] yRotationCounterClockwise = {-1, 0};
 
     public Shape() {
         int random = (int) (Math.random() * 7);
@@ -90,24 +90,40 @@ public class Shape {
         int centerX = squareMatrix[row][col].getX();
         int centerY = squareMatrix[row][col].getY();
 
+        Square[][] tempMatrix = new Square[squareMatrix.length][squareMatrix[0].length];
+
+        int counter = 0;
+
         for (int i = 0; i < squareMatrix.length; i++) {
             for (int j = 0; j < squareMatrix[0].length; j++) {
                 if (squareMatrix[i][j] != null) {
                     int x = squareMatrix[i][j].getX() - centerX;
                     int y = squareMatrix[i][j].getY() - centerY;
 
-
-                    int newX = (xRotationClockwise[0] * x) + (xRotationClockwise[1] * y);
-                    int newY = (yRotationClockwise[0] * x) + (yRotationClockwise[1] * y);
-
+                    int newX = (xRotationCounterClockwise[0] * x) + (xRotationCounterClockwise[1] * y);
+                    int newY = (yRotationCounterClockwise[0] * x) + (yRotationCounterClockwise[1] * y);
 
                     int controlX = newX + centerX;
 
                     //2 schleifen oder 2 arrays
 
-                    if (controlX < 10 && controlX > 0) {
-                        squareMatrix[i][j].setX(newX + centerX);
-                        squareMatrix[i][j].setY(newY + centerY);
+                    if (controlX <= 9 && controlX >= 0) {
+                        tempMatrix[i][j] = new Square(null);
+                        tempMatrix[i][j].setX(newX + centerX);
+                        tempMatrix[i][j].setY(newY + centerY);
+                    }
+                    if (tempMatrix[i][j].getX() + 1 > 9 || tempMatrix[i][j].getX() - 1 < 0) {
+                        counter++;
+                    }
+                }
+            }
+        }
+        if (counter == 0) {
+            for (int i = 0; i < squareMatrix.length; i++) {
+                for (int j = 0; j < squareMatrix[0].length; j++) {
+                    if (squareMatrix[i][j] != null) {
+                        squareMatrix[i][j].setX(tempMatrix[i][j].getX());
+                        squareMatrix[i][j].setY(tempMatrix[i][j].getY());
                     }
                 }
             }
