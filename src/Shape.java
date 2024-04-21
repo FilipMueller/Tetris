@@ -8,7 +8,7 @@ public class Shape {
 
     private static final int BLOCK_SIZE = 30;
 
-    private String centerPoint;
+    String centerPoint;
 
     private final int[] xRotationCounterClockwise = {0, 1};
 
@@ -82,52 +82,6 @@ public class Shape {
             }
         }
         initialSpawn = false;
-    }
-
-    public void rotate() {
-        int row = Integer.parseInt(centerPoint.substring(0, 1));
-        int col = Integer.parseInt(centerPoint.substring(1));
-        int centerX = squareMatrix[row][col].getX();
-        int centerY = squareMatrix[row][col].getY();
-
-        Square[][] tempMatrix = new Square[squareMatrix.length][squareMatrix[0].length];
-
-        int counter = 0;
-
-        for (int i = 0; i < squareMatrix.length; i++) {
-            for (int j = 0; j < squareMatrix[0].length; j++) {
-                if (squareMatrix[i][j] != null) {
-                    int x = squareMatrix[i][j].getX() - centerX;
-                    int y = squareMatrix[i][j].getY() - centerY;
-
-                    int newX = (xRotationCounterClockwise[0] * x) + (xRotationCounterClockwise[1] * y);
-                    int newY = (yRotationCounterClockwise[0] * x) + (yRotationCounterClockwise[1] * y);
-
-                    int controlX = newX + centerX;
-
-                    //2 schleifen oder 2 arrays
-
-                    if (controlX <= 9 && controlX >= 0) {
-                        tempMatrix[i][j] = new Square(null);
-                        tempMatrix[i][j].setX(newX + centerX);
-                        tempMatrix[i][j].setY(newY + centerY);
-                    }
-                    if (tempMatrix[i][j].getX() + 1 > 9 || tempMatrix[i][j].getX() - 1 < 0) {
-                        counter++;
-                    }
-                }
-            }
-        }
-        if (counter == 0) {
-            for (int i = 0; i < squareMatrix.length; i++) {
-                for (int j = 0; j < squareMatrix[0].length; j++) {
-                    if (squareMatrix[i][j] != null) {
-                        squareMatrix[i][j].setX(tempMatrix[i][j].getX());
-                        squareMatrix[i][j].setY(tempMatrix[i][j].getY());
-                    }
-                }
-            }
-        }
     }
 
     public void moveDown() {

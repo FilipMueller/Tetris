@@ -20,6 +20,10 @@ public class Board  extends JPanel implements KeyListener {
 
     private static final int FAST = 50;
 
+    private final int[] xRotationCounterClockwise = {0, 1};
+
+    private final int[] yRotationCounterClockwise = {-1, 0};
+
     private int delayTimeForMovement = NORMAL;
 
     private long beginTime;
@@ -60,6 +64,47 @@ public class Board  extends JPanel implements KeyListener {
         }
         for (int column = 0; column < BOARD_WIDTH + 1; column++) {
             g.drawLine(column * BLOCK_SIZE, 0, column * BLOCK_SIZE, BLOCK_SIZE * BOARD_HEIGHT);
+        }
+    }
+
+    public void rotate() {
+        int row = Integer.parseInt(currentShape.centerPoint.substring(0, 1));
+        int col = Integer.parseInt(currentShape.centerPoint.substring(1));
+        int centerX = currentShape.squareMatrix[row][col].getX();
+        int centerY = currentShape.squareMatrix[row][col].getY();
+
+        Square[][] tempMatrix = new Square[currentShape.squareMatrix.length][currentShape.squareMatrix[0].length];
+
+        int counter = 0;
+
+        for (int i = 0; i < currentShape.squareMatrix.length; i++) {
+            for (int j = 0; j < currentShape.squareMatrix[0].length; j++) {
+                if (currentShape.squareMatrix[i][j].getColor() != null) {
+                    int x = currentShape.squareMatrix[i][j].getX() - centerX;
+                    int y = currentShape.squareMatrix[i][j].getY() - centerY;
+
+                    int newX = (xRotationCounterClockwise[0] * x) + (xRotationCounterClockwise[1] * y);
+                    int newY = (yRotationCounterClockwise[0] * x) + (yRotationCounterClockwise[1] * y);
+
+                    tempMatrix[i][j] = new Square(null);
+                    tempMatrix[i][j].setX(newX + centerX);
+                    tempMatrix[i][j].setY(newY + centerY);
+
+                    if (tempMatrix[i][j].getX() > 9 || tempMatrix[i][j].getX() < 0) {
+                        counter++;
+                    }
+                }
+            }
+        }
+        if (counter == 0) {
+            for (int i = 0; i < currentShape.squareMatrix.length; i++) {
+                for (int j = 0; j < currentShape.squareMatrix[0].length; j++) {
+                    if (currentShape.squareMatrix[i][j].getColor() != null) {
+                        currentShape.squareMatrix[i][j].setX(tempMatrix[i][j].getX());
+                        currentShape.squareMatrix[i][j].setY(tempMatrix[i][j].getY());
+                    }
+                }
+            }
         }
     }
 
@@ -162,7 +207,7 @@ public class Board  extends JPanel implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_UP) {
-            currentShape.rotate();
+            rotate();
         }
         if (e.getKeyCode() == KeyEvent.VK_LEFT && (!checkIfHasNeighbour(1))) {
             currentShape.moveLeft();
