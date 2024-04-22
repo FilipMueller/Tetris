@@ -2,7 +2,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
 
 public class Board  extends JPanel implements KeyListener {
 
@@ -90,7 +89,7 @@ public class Board  extends JPanel implements KeyListener {
                     tempMatrix[i][j].setX(newX + centerX);
                     tempMatrix[i][j].setY(newY + centerY);
 
-                    if (tempMatrix[i][j].getX() > 9 || tempMatrix[i][j].getX() < 0) {
+                    if (tempMatrix[i][j].getX() > 9 || tempMatrix[i][j].getX() < 0 || checkIfHasNeighbour(0) || checkIfHasNeighbour(1) || checkIfHasNeighbour(2)) {
                         counter++;
                     }
                 }
@@ -171,7 +170,7 @@ public class Board  extends JPanel implements KeyListener {
                             }
                             break;
                         case 2: //check bottom
-                            if (y == board.length - 1 || board[y + 1][x] != null) {
+                            if (y >= board.length - 1 || board[y + 1][x] != null) {
                                 return true;
                             }
                             break;
