@@ -27,6 +27,8 @@ public class Board  extends JPanel implements KeyListener {
 
     private long beginTime;
 
+    private int score = 0;
+
     private final Square[][] board = new Square[BOARD_HEIGHT][BOARD_WIDTH];
 
     Shape currentShape = new Shape();
@@ -52,6 +54,12 @@ public class Board  extends JPanel implements KeyListener {
             fillArray();
             currentShape = new Shape();
         }
+
+        Font font = new Font("jaööp", Font.ITALIC, 20);
+        g.setColor(Color.WHITE);
+        g.setFont(font);
+        g.drawString("Score: ", 325, 150);
+        g.drawString(score + "", 325, 175);
 
         checkIfRowIsFilled();
         drawBoard(g);
@@ -127,6 +135,8 @@ public class Board  extends JPanel implements KeyListener {
         for (int i = 0; i < 10; i++) {
             board[rowNumber][i] = null;
         }
+
+        score += 100;
 
         for (int i = rowNumber - 1; i >= 0; i--) {
             for (int j = 0; j < 10; j++) {
