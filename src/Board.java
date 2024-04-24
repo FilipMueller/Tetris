@@ -97,7 +97,7 @@ public class Board  extends JPanel implements KeyListener {
                     tempMatrix[i][j].setX(newX + centerX);
                     tempMatrix[i][j].setY(newY + centerY);
 
-                    if (tempMatrix[i][j].getX() > 9 || tempMatrix[i][j].getX() < 0 || checkIfHasNeighbour(0) || checkIfHasNeighbour(1) || checkIfHasNeighbour(2)) {
+                    if (tempMatrix[i][j].getX() > 9 || tempMatrix[i][j].getX() < 0 || tempMatrix[i][j].getY() < 0 || checkIfHasNeighbour(0) || checkIfHasNeighbour(1) || checkIfHasNeighbour(2)) {
                         counter++;
                     }
                 }
