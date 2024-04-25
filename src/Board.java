@@ -29,17 +29,29 @@ public class Board  extends JPanel implements KeyListener {
 
     private int score = 0;
 
+    private boolean pause = false;
+
     private final Square[][] board = new Square[BOARD_HEIGHT][BOARD_WIDTH];
 
     Shape currentShape = new Shape();
 
+    private int paintBackground = 0;
+
     public Board() {
         Timer looper = new Timer(delay, _ -> {
             if (System.currentTimeMillis() - beginTime > delayTimeForMovement) {
-                if (!checkIfHasNeighbour(2)) currentShape.moveDown();
+                if (!checkIfHasNeighbour(2) && !pause) currentShape.moveDown();
                 beginTime = System.currentTimeMillis();
             }
-            repaint();
+            if (!pause) {
+                paintBackground = 0;
+                repaint();
+            }
+            if (pause && paintBackground == 0) {
+                repaint();
+                paintBackground = 1;
+            }
+
         });
         looper.start();
     }
@@ -47,19 +59,26 @@ public class Board  extends JPanel implements KeyListener {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        Font fontScore = new Font("fontScore", Font.ITALIC, 20);
+        Font fontPause = new Font("fontPause", Font.BOLD, 50);
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, getWidth(), getHeight());
+        if (pause) {
+            g.setColor(Color.LIGHT_GRAY);
+            g.fillRect(0, 0, 300, 600);
+        }
+
 
         if (checkIfHasNeighbour(2)) {
             fillArray();
             currentShape = new Shape();
         }
 
-        Font font = new Font("jaööp", Font.ITALIC, 20);
         g.setColor(Color.WHITE);
-        g.setFont(font);
+        g.setFont(fontScore);
         g.drawString("Score: ", 325, 150);
         g.drawString(score + "", 325, 175);
+        g.drawString( "'p' = pause", 315, 300);
 
         checkIfRowIsFilled();
         drawBoard(g);
@@ -71,6 +90,12 @@ public class Board  extends JPanel implements KeyListener {
         }
         for (int column = 0; column < BOARD_WIDTH + 1; column++) {
             g.drawLine(column * BLOCK_SIZE, 0, column * BLOCK_SIZE, BLOCK_SIZE * BOARD_HEIGHT);
+        }
+
+        if (pause) {
+            g.setColor(Color.RED);
+            g.setFont(fontPause);
+            g.drawString("PAUSED", 48, 280);
         }
     }
 
@@ -215,17 +240,20 @@ public class Board  extends JPanel implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_UP) {
+        if (e.getKeyCode() == KeyEvent.VK_UP && !pause) {
             rotate();
         }
-        if (e.getKeyCode() == KeyEvent.VK_LEFT && (!checkIfHasNeighbour(1))) {
+        if (e.getKeyCode() == KeyEvent.VK_LEFT && (!checkIfHasNeighbour(1)) && !pause) {
             currentShape.moveLeft();
         }
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT && (!checkIfHasNeighbour(0))) {
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT && (!checkIfHasNeighbour(0)) && !pause) {
             currentShape.moveRight();
         }
-        if (e.getKeyCode() == KeyEvent.VK_DOWN && !checkIfHasNeighbour(2)) {
+        if (e.getKeyCode() == KeyEvent.VK_DOWN && !checkIfHasNeighbour(2) && !pause) {
             delayTimeForMovement = FAST;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_P) {
+            pause = !pause;
         }
     }
 
