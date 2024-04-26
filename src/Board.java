@@ -14,11 +14,11 @@ public class Board  extends JPanel implements KeyListener {
 
     private static final int FPS = 60;
 
-    private static final int delay = 1000 / FPS;
+    private static int delay = 1000 / FPS;
 
-    private static final int NORMAL = 600;
+    private static int NORMAL = 700;
 
-    private static final int FAST = 50;
+    private static final int FAST = 40;
 
     private final int[] xRotationCounterClockwise = {0, 1};
 
@@ -38,10 +38,12 @@ public class Board  extends JPanel implements KeyListener {
 
     private int paintBackground = 0;
 
-    File CSV = new File("F:\\CodingProjects\\JavaProjects\\Tetris\\src\\highscore.txt");
+    File CSV = new File("src/highscore.txt");
+
+    Timer looper;
 
     public Board() {
-        Timer looper = new Timer(delay, _ -> {
+        looper = new Timer(delay, _ -> {
             if (System.currentTimeMillis() - beginTime > delayTimeForMovement) {
                 if (!checkIfHasNeighbour(2) && !pause) currentShape.moveDown();
                 beginTime = System.currentTimeMillis();
@@ -50,6 +52,7 @@ public class Board  extends JPanel implements KeyListener {
                 paintBackground = 0;
                 repaint();
             }
+
             if (pause && paintBackground == 0) {
                 repaint();
                 paintBackground = 1;
@@ -81,7 +84,8 @@ public class Board  extends JPanel implements KeyListener {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Font fontScore = new Font("fontScore", Font.ITALIC, 20);
+        Font fontScore = new Font("fontScore", Font.PLAIN, 20);
+        Font fontp = new Font("fontp", Font.PLAIN, 16);
         Font fontPause = new Font("fontPause", Font.BOLD, 50);
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, getWidth(), getHeight());
@@ -93,6 +97,11 @@ public class Board  extends JPanel implements KeyListener {
         if (checkIfHasNeighbour(2)) {
             fillArray();
             currentShape = new Shape();
+            if (board[0][5] != null) {
+                gameover(g);
+                return;
+            }
+            NORMAL--;
         }
 
         if (readHighscoreFromCSV() < score) {
@@ -104,26 +113,50 @@ public class Board  extends JPanel implements KeyListener {
         g.drawString("Highscore", 315, 150);
         g.drawString(readHighscoreFromCSV() + "", 315, 175);
         g.setColor(Color.WHITE);
-        g.drawString("Score", 325, 300);
-        g.drawString(score + "", 325, 325);
+        g.drawString("Score", 315, 300);
+        g.drawString(score + "", 315, 325);
+        g.setFont(fontp);
         g.drawString( "'p' = pause", 315, 480);
 
         checkIfRowIsFilled();
         drawBoard(g);
         currentShape.draw(g);
 
+        drawGameField(g);
+
+        if (pause) {
+            g.setColor(Color.RED);
+            g.setFont(fontPause);
+            g.drawString("PAUSED", 48, 280);
+        }
+    }
+
+    public void gameover(Graphics g) {
+        looper.stop();
+        drawGameField(g);
+        drawBoard(g);
+        Font font = new Font("font", Font.BOLD, 50);
+        Font fontTwo = new Font("font2", Font.ITALIC, 45);
+        g.setColor(Color.BLACK);
+        g.setFont(font);
+        g.drawString("GAME OVER", 50, 279);
+        g.drawString("GAME OVER", 49, 280);
+        g.drawString("GAME OVER", 50, 281);
+        g.drawString("GAME OVER", 51, 280);
+        g.setColor(Color.RED);
+        g.drawString("GAME OVER", 50, 280);
+        g.setFont(fontTwo);
+        g.setColor(Color.YELLOW);
+        g.drawString(score + "", 200, 325);
+    }
+
+    public void drawGameField(Graphics g) {
         g.setColor(Color.WHITE);
         for (int row = 0; row < BOARD_HEIGHT; row++) {
             g.drawLine(0, BLOCK_SIZE * row, BLOCK_SIZE * BOARD_WIDTH, BLOCK_SIZE * row);
         }
         for (int column = 0; column < BOARD_WIDTH + 1; column++) {
             g.drawLine(column * BLOCK_SIZE, 0, column * BLOCK_SIZE, BLOCK_SIZE * BOARD_HEIGHT);
-        }
-
-        if (pause) {
-            g.setColor(Color.RED);
-            g.setFont(fontPause);
-            g.drawString("PAUSED", 48, 280);
         }
     }
 
