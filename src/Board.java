@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.*;
 
 public class Board  extends JPanel implements KeyListener {
 
@@ -37,6 +38,8 @@ public class Board  extends JPanel implements KeyListener {
 
     private int paintBackground = 0;
 
+    File CSV = new File("F:\\CodingProjects\\JavaProjects\\Tetris\\src\\highscore.txt");
+
     public Board() {
         Timer looper = new Timer(delay, _ -> {
             if (System.currentTimeMillis() - beginTime > delayTimeForMovement) {
@@ -56,6 +59,25 @@ public class Board  extends JPanel implements KeyListener {
         looper.start();
     }
 
+    public void writeHighscoreToCSV(int score) {
+        try (FileWriter writer = new FileWriter(CSV)) {
+            writer.append(String.valueOf(score));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public int readHighscoreFromCSV() {
+        int highscore = 0;
+        try (BufferedReader reader = new BufferedReader(new FileReader(CSV))) {
+            String line = reader.readLine();
+            highscore = Integer.parseInt(line);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return highscore;
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -68,17 +90,23 @@ public class Board  extends JPanel implements KeyListener {
             g.fillRect(0, 0, 300, 600);
         }
 
-
         if (checkIfHasNeighbour(2)) {
             fillArray();
             currentShape = new Shape();
         }
 
-        g.setColor(Color.WHITE);
+        if (readHighscoreFromCSV() < score) {
+            writeHighscoreToCSV(score);
+        }
+
+        g.setColor(Color.YELLOW);
         g.setFont(fontScore);
-        g.drawString("Score: ", 325, 150);
-        g.drawString(score + "", 325, 175);
-        g.drawString( "'p' = pause", 315, 300);
+        g.drawString("Highscore", 315, 150);
+        g.drawString(readHighscoreFromCSV() + "", 315, 175);
+        g.setColor(Color.WHITE);
+        g.drawString("Score", 325, 300);
+        g.drawString(score + "", 325, 325);
+        g.drawString( "'p' = pause", 315, 480);
 
         checkIfRowIsFilled();
         drawBoard(g);
