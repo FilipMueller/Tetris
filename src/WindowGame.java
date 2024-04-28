@@ -2,7 +2,7 @@ import javax.swing.*;
 
 public class WindowGame {
 
-    public static final int WIDTH = 445, HEIGHT = 639;
+    private static final int WIDTH = 445, HEIGHT = 639;
 
     public WindowGame() {
         JFrame window = new JFrame("Tetris");

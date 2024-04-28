@@ -14,7 +14,7 @@ public class Board  extends JPanel implements KeyListener {
 
     private static final int FPS = 60;
 
-    private static int delay = 1000 / FPS;
+    private static final int delay = 1000 / FPS;
 
     private static int NORMAL = 700;
 
@@ -66,7 +66,7 @@ public class Board  extends JPanel implements KeyListener {
         try (FileWriter writer = new FileWriter(CSV)) {
             writer.append(String.valueOf(score));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("WRITE FAILED");
         }
     }
 
@@ -74,9 +74,11 @@ public class Board  extends JPanel implements KeyListener {
         int highscore = 0;
         try (BufferedReader reader = new BufferedReader(new FileReader(CSV))) {
             String line = reader.readLine();
-            highscore = Integer.parseInt(line);
+            if (line != null) {
+                highscore = Integer.parseInt(line.trim());
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("READ FAILED");
         }
         return highscore;
     }
