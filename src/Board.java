@@ -40,6 +40,7 @@ public class Board  extends JPanel implements KeyListener {
 
     File CSV = new File("src/highscore.txt");
 
+
     Timer looper;
 
     public Board() {
@@ -63,22 +64,42 @@ public class Board  extends JPanel implements KeyListener {
     }
 
     public void writeHighscoreToCSV(int score) {
-        try (FileWriter writer = new FileWriter(CSV)) {
-            writer.append(String.valueOf(score));
+        try {
+            String content = String.valueOf(score);
+            File tempFile = File.createTempFile("tempfile", ".txt");
+            BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+            writer.write(content);
+            writer.close();
+
+            try(InputStream temp = new FileInputStream(tempFile);
+                OutputStream outputStream = new FileOutputStream("/highscore.txt")) {
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                while ((bytesRead = temp.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("WRITE FAILED");
+            }
         } catch (IOException e) {
-            throw new RuntimeException("WRITE FAILED");
+            throw new RuntimeException("AJHLSDJH");
         }
     }
 
     public int readHighscoreFromCSV() {
         int highscore = 0;
-        try (BufferedReader reader = new BufferedReader(new FileReader(CSV))) {
-            String line = reader.readLine();
-            if (line != null) {
-                highscore = Integer.parseInt(line.trim());
+        try (InputStream inputStream = getClass().getResourceAsStream("/highscore.txt")) {
+            if (inputStream != null) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                String line = reader.readLine();
+                if (line != null) {
+                    highscore = Integer.parseInt(line.trim());
+                }
+            } else {
+                throw new RuntimeException("File not found");
             }
         } catch (IOException e) {
-            throw new RuntimeException("READ FAILED");
+            throw new RuntimeException("ERROR reading File");
         }
         return highscore;
     }
