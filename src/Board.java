@@ -24,6 +24,10 @@ public class Board  extends JPanel implements KeyListener {
 
     private final int[] yRotationCounterClockwise = {-1, 0};
 
+    private final int[] xRotationClockwise = {0, -1};
+
+    private final int[] yRotationClockwise = {1, 0};
+
     private int delayTimeForMovement = NORMAL;
 
     private long beginTime;
@@ -37,9 +41,6 @@ public class Board  extends JPanel implements KeyListener {
     Shape currentShape = new Shape();
 
     private int paintBackground = 0;
-
-    File CSV = new File("src/highscore.txt");
-
 
     Timer looper;
 
@@ -64,25 +65,10 @@ public class Board  extends JPanel implements KeyListener {
     }
 
     public void writeHighscoreToCSV(int score) {
-        try {
-            String content = String.valueOf(score);
-            File tempFile = File.createTempFile("tempfile", ".txt");
-            BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
-            writer.write(content);
-            writer.close();
-
-            try(InputStream temp = new FileInputStream(tempFile);
-                OutputStream outputStream = new FileOutputStream("/highscore.txt")) {
-                byte[] buffer = new byte[4096];
-                int bytesRead;
-                while ((bytesRead = temp.read(buffer)) != -1) {
-                    outputStream.write(buffer, 0, bytesRead);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException("WRITE FAILED");
-            }
+        try(FileWriter writer = new FileWriter("src/highscore.txt")) {
+            writer.append(String.valueOf(score));
         } catch (IOException e) {
-            throw new RuntimeException("AJHLSDJH");
+            throw new RuntimeException("WRITE FAILED");
         }
     }
 
@@ -139,7 +125,7 @@ public class Board  extends JPanel implements KeyListener {
         g.drawString("Score", 315, 300);
         g.drawString(score + "", 315, 325);
         g.setFont(fontp);
-        g.drawString( "'p' = pause", 315, 480);
+        g.drawString( "'w' = pause", 315, 480);
 
         checkIfRowIsFilled();
         drawBoard(g);
@@ -183,7 +169,7 @@ public class Board  extends JPanel implements KeyListener {
         }
     }
 
-    public void rotate() {
+    public void rotate(int direction) {
         int row = Integer.parseInt(currentShape.centerPoint.substring(0, 1));
         int col = Integer.parseInt(currentShape.centerPoint.substring(1));
         int centerX = currentShape.squareMatrix[row][col].getX();
@@ -198,9 +184,17 @@ public class Board  extends JPanel implements KeyListener {
                 if (currentShape.squareMatrix[i][j].getColor() != null) {
                     int x = currentShape.squareMatrix[i][j].getX() - centerX;
                     int y = currentShape.squareMatrix[i][j].getY() - centerY;
+                    int newX;
+                    int newY;
 
-                    int newX = (xRotationCounterClockwise[0] * x) + (xRotationCounterClockwise[1] * y);
-                    int newY = (yRotationCounterClockwise[0] * x) + (yRotationCounterClockwise[1] * y);
+                    if (direction == 1) {
+                        newX = (xRotationCounterClockwise[0] * x) + (xRotationCounterClockwise[1] * y);
+                        newY = (yRotationCounterClockwise[0] * x) + (yRotationCounterClockwise[1] * y);
+                    } else {
+                        newX = (xRotationClockwise[0] * x) + (xRotationClockwise[1] * y);
+                        newY = (yRotationClockwise[0] * x) + (yRotationClockwise[1] * y);
+                    }
+
 
                     tempMatrix[i][j] = new Square(null);
                     tempMatrix[i][j].setX(newX + centerX);
@@ -324,32 +318,35 @@ public class Board  extends JPanel implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_UP && !pause) {
-            rotate();
+        if (e.getKeyCode() == KeyEvent.VK_Q && !pause) {
+            rotate(1);
         }
-        if (e.getKeyCode() == KeyEvent.VK_LEFT && (!checkIfHasNeighbour(1)) && !pause) {
+        if (e.getKeyCode() == KeyEvent.VK_E && !pause) {
+            rotate(0);
+        }
+        if (e.getKeyCode() == KeyEvent.VK_A && (!checkIfHasNeighbour(1)) && !pause) {
             currentShape.moveLeft();
         }
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT && (!checkIfHasNeighbour(0)) && !pause) {
+        if (e.getKeyCode() == KeyEvent.VK_D && (!checkIfHasNeighbour(0)) && !pause) {
             currentShape.moveRight();
         }
-        if (e.getKeyCode() == KeyEvent.VK_DOWN && !checkIfHasNeighbour(2) && !pause) {
+        if (e.getKeyCode() == KeyEvent.VK_S && !checkIfHasNeighbour(2) && !pause) {
             delayTimeForMovement = FAST;
         }
-        if (e.getKeyCode() == KeyEvent.VK_P) {
+        if (e.getKeyCode() == KeyEvent.VK_W) {
             pause = !pause;
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+        if (e.getKeyCode() == KeyEvent.VK_A) {
             delayTimeForMovement = NORMAL;
         }
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+        if (e.getKeyCode() == KeyEvent.VK_D) {
             delayTimeForMovement = NORMAL;
         }
-        if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+        if (e.getKeyCode() == KeyEvent.VK_S) {
             delayTimeForMovement = NORMAL;
         }
     }
