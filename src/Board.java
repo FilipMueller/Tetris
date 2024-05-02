@@ -37,6 +37,8 @@ public class Board  extends JPanel implements KeyListener {
 
     private boolean pause = false;
 
+    private boolean gameIsOver = false;
+
     private final Square[][] board = new Square[BOARD_HEIGHT][BOARD_WIDTH];
 
     Shape currentShape = new Shape();
@@ -142,6 +144,7 @@ public class Board  extends JPanel implements KeyListener {
     }
 
     public void gameover(Graphics g) {
+        gameIsOver = true;
         looper.stop();
         drawGameField(g);
         drawBoard(g);
@@ -158,6 +161,7 @@ public class Board  extends JPanel implements KeyListener {
         g.setFont(fontTwo);
         g.setColor(Color.YELLOW);
         g.drawString(score + "", 200, 325);
+        g.drawString( "'r' = restart", 100, 360);
     }
 
     public void resetBoard() {
@@ -343,7 +347,7 @@ public class Board  extends JPanel implements KeyListener {
         if (e.getKeyCode() == KeyEvent.VK_P) {
             pause = !pause;
         }
-        if (e.getKeyCode() == KeyEvent.VK_R) {
+        if (e.getKeyCode() == KeyEvent.VK_R && gameIsOver) {
             resetBoard();
             looper.start();
             NORMAL = 700;
