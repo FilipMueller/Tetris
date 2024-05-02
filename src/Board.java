@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.*;
+import java.util.Arrays;
 
 public class Board  extends JPanel implements KeyListener {
 
@@ -157,6 +158,12 @@ public class Board  extends JPanel implements KeyListener {
         g.setFont(fontTwo);
         g.setColor(Color.YELLOW);
         g.drawString(score + "", 200, 325);
+    }
+
+    public void resetBoard() {
+        for (Square[] squares : board) {
+            Arrays.fill(squares, null);
+        }
     }
 
     public void drawGameField(Graphics g) {
@@ -333,8 +340,13 @@ public class Board  extends JPanel implements KeyListener {
         if (e.getKeyCode() == KeyEvent.VK_S && !checkIfHasNeighbour(2) && !pause) {
             delayTimeForMovement = FAST;
         }
-        if (e.getKeyCode() == KeyEvent.VK_W) {
+        if (e.getKeyCode() == KeyEvent.VK_P) {
             pause = !pause;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_R) {
+            resetBoard();
+            looper.start();
+            NORMAL = 700;
         }
     }
 
