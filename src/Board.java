@@ -50,7 +50,7 @@ public class Board  extends JPanel implements KeyListener {
     public Board() {
         looper = new Timer(delay, _ -> {
             if (System.currentTimeMillis() - beginTime > delayTimeForMovement) {
-                if (!checkIfHasNeighbour(2) && !pause) currentShape.moveDown();
+                if (!checkIfHasNeighbour(currentShape, 2) && !pause) currentShape.moveDown();
                 beginTime = System.currentTimeMillis();
             }
             if (!pause) {
@@ -106,7 +106,7 @@ public class Board  extends JPanel implements KeyListener {
             g.fillRect(0, 0, 300, 600);
         }
 
-        if (checkIfHasNeighbour(2)) {
+        if (checkIfHasNeighbour(currentShape, 2)) {
             fillArray();
             currentShape = new Shape();
             if (board[0][5] != null) {
@@ -186,7 +186,8 @@ public class Board  extends JPanel implements KeyListener {
         int centerX = currentShape.squareMatrix[row][col].getX();
         int centerY = currentShape.squareMatrix[row][col].getY();
 
-        Square[][] tempMatrix = new Square[currentShape.squareMatrix.length][currentShape.squareMatrix[0].length];
+        Shape tempShape = new Shape(currentShape.random);
+        tempShape.centerPoint = currentShape.centerPoint;
 
         int counter = 0;
 
@@ -206,12 +207,11 @@ public class Board  extends JPanel implements KeyListener {
                         newY = (yRotationClockwise[0] * x) + (yRotationClockwise[1] * y);
                     }
 
+                    tempShape.squareMatrix[i][j] = new Square(null);
+                    tempShape.squareMatrix[i][j].setX(newX + centerX);
+                    tempShape.squareMatrix[i][j].setY(newY + centerY);
 
-                    tempMatrix[i][j] = new Square(null);
-                    tempMatrix[i][j].setX(newX + centerX);
-                    tempMatrix[i][j].setY(newY + centerY);
-
-                    if (tempMatrix[i][j].getX() > 9 || tempMatrix[i][j].getX() < 0 || tempMatrix[i][j].getY() < 0 || checkIfHasNeighbour(0) || checkIfHasNeighbour(1) || checkIfHasNeighbour(2)) {
+                    if (checkIfHasNeighbour(tempShape, 0) || checkIfHasNeighbour(tempShape, 1) || checkIfHasNeighbour(tempShape, 2)) {
                         counter++;
                     }
                 }
@@ -221,8 +221,8 @@ public class Board  extends JPanel implements KeyListener {
             for (int i = 0; i < currentShape.squareMatrix.length; i++) {
                 for (int j = 0; j < currentShape.squareMatrix[0].length; j++) {
                     if (currentShape.squareMatrix[i][j].getColor() != null) {
-                        currentShape.squareMatrix[i][j].setX(tempMatrix[i][j].getX());
-                        currentShape.squareMatrix[i][j].setY(tempMatrix[i][j].getY());
+                        currentShape.squareMatrix[i][j].setX(tempShape.squareMatrix[i][j].getX());
+                        currentShape.squareMatrix[i][j].setY(tempShape.squareMatrix[i][j].getY());
                     }
                 }
             }
@@ -276,7 +276,7 @@ public class Board  extends JPanel implements KeyListener {
         }
     }
 
-    public boolean checkIfHasNeighbour(int direction) {
+    public boolean checkIfHasNeighbour(Shape shape, int direction) {
         for (Square[] squareArray : currentShape.squareMatrix) {
             for (Square square : squareArray) {
                 if (square.getColor() != null) {
@@ -335,13 +335,13 @@ public class Board  extends JPanel implements KeyListener {
         if (e.getKeyCode() == KeyEvent.VK_E && !pause) {
             rotate(0);
         }
-        if (e.getKeyCode() == KeyEvent.VK_A && (!checkIfHasNeighbour(1)) && !pause) {
+        if (e.getKeyCode() == KeyEvent.VK_A && (!checkIfHasNeighbour(currentShape, 1)) && !pause) {
             currentShape.moveLeft();
         }
-        if (e.getKeyCode() == KeyEvent.VK_D && (!checkIfHasNeighbour(0)) && !pause) {
+        if (e.getKeyCode() == KeyEvent.VK_D && (!checkIfHasNeighbour(currentShape, 0)) && !pause) {
             currentShape.moveRight();
         }
-        if (e.getKeyCode() == KeyEvent.VK_S && !checkIfHasNeighbour(2) && !pause) {
+        if (e.getKeyCode() == KeyEvent.VK_S && !checkIfHasNeighbour(currentShape, 2) && !pause) {
             delayTimeForMovement = FAST;
         }
         if (e.getKeyCode() == KeyEvent.VK_P) {

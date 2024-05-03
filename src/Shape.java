@@ -10,16 +10,26 @@ public class Shape {
 
     String centerPoint;
 
-    private final int[] xRotationCounterClockwise = {0, 1};
+    int random;
 
-    private final int[] yRotationCounterClockwise = {-1, 0};
+    public Shape(int random) {
+        this.random = random;
+        squareMatrix = getSquareMatrix(random);
+    }
+
 
     public Shape() {
-        int random = (int) (Math.random() * 7);
+        random = (int) (Math.random() * 1);
+        squareMatrix = getSquareMatrix(random);
+    }
+
+    private Square[][] getSquareMatrix(int random) {
+        final Square[][] squareMatrix;
         if (random == 0) {
             squareMatrix = new Square[][]{
                     {new Square(Color.CYAN), new Square(Color.CYAN), new Square(Color.CYAN), new Square(Color.CYAN)}
             };
+            this.random = 0;
             this.centerPoint = "01";
         }
         else if (random == 1) {
@@ -64,6 +74,7 @@ public class Shape {
             };
             this.centerPoint = "11";
         }
+        return squareMatrix;
     }
 
     public void draw(Graphics g) {
