@@ -19,7 +19,7 @@ public class Shape {
 
 
     public Shape() {
-        random = (int) (Math.random() * 1);
+        random = (int) (Math.random() * 7);
         squareMatrix = getSquareMatrix(random);
     }
 
@@ -37,6 +37,7 @@ public class Shape {
                     {new Square(Color.BLUE), new Square(null), new Square(null)},
                     {new Square(Color.BLUE), new Square(Color.BLUE), new Square(Color.BLUE)}
             };
+            this.random = 1;
             this.centerPoint = "11";
         }
         else if (random == 2) {
@@ -44,6 +45,7 @@ public class Shape {
                     {new Square(null), new Square(null), new Square(Color.ORANGE)},
                     {new Square(Color.ORANGE), new Square(Color.ORANGE), new Square(Color.ORANGE)}
             };
+            this.random = 2;
             this.centerPoint = "11";
         }
         else if (random == 3) {
@@ -51,6 +53,7 @@ public class Shape {
                     {new Square(Color.YELLOW), new Square(Color.YELLOW)},
                     {new Square(Color.YELLOW), new Square(Color.YELLOW)}
             };
+            this.random = 3;
             this.centerPoint = "10";
         }
         else if (random == 4) {
@@ -58,6 +61,7 @@ public class Shape {
                     {new Square(null), new Square(Color.GREEN), new Square(Color.GREEN)},
                     {new Square(Color.GREEN), new Square(Color.GREEN), new Square(null)}
             };
+            this.random = 4;
             this.centerPoint = "11";
         }
         else if (random == 5) {
@@ -65,6 +69,7 @@ public class Shape {
                     {new Square(null), new Square(Color.PINK), new Square(null)},
                     {new Square(Color.PINK), new Square(Color.PINK), new Square(Color.PINK)}
             };
+            this.random = 5;
             this.centerPoint = "11";
         }
         else {
@@ -72,6 +77,7 @@ public class Shape {
                     {new Square(Color.RED), new Square(Color.RED), new Square(null)},
                     {new Square(null), new Square(Color.RED), new Square(Color.RED)}
             };
+            this.random = 6;
             this.centerPoint = "11";
         }
         return squareMatrix;

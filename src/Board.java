@@ -189,8 +189,6 @@ public class Board  extends JPanel implements KeyListener {
         Shape tempShape = new Shape(currentShape.random);
         tempShape.centerPoint = currentShape.centerPoint;
 
-        int counter = 0;
-
         for (int i = 0; i < currentShape.squareMatrix.length; i++) {
             for (int j = 0; j < currentShape.squareMatrix[0].length; j++) {
                 if (currentShape.squareMatrix[i][j].getColor() != null) {
@@ -207,17 +205,12 @@ public class Board  extends JPanel implements KeyListener {
                         newY = (yRotationClockwise[0] * x) + (yRotationClockwise[1] * y);
                     }
 
-                    tempShape.squareMatrix[i][j] = new Square(null);
                     tempShape.squareMatrix[i][j].setX(newX + centerX);
                     tempShape.squareMatrix[i][j].setY(newY + centerY);
-
-                    if (checkIfHasNeighbour(tempShape, 0) || checkIfHasNeighbour(tempShape, 1) || checkIfHasNeighbour(tempShape, 2)) {
-                        counter++;
-                    }
                 }
             }
         }
-        if (counter == 0) {
+        if (!checkIfHasNeighbour(tempShape, 0) && !checkIfHasNeighbour(tempShape, 1) && !checkIfHasNeighbour(tempShape, 2)) {
             for (int i = 0; i < currentShape.squareMatrix.length; i++) {
                 for (int j = 0; j < currentShape.squareMatrix[0].length; j++) {
                     if (currentShape.squareMatrix[i][j].getColor() != null) {
@@ -277,29 +270,29 @@ public class Board  extends JPanel implements KeyListener {
     }
 
     public boolean checkIfHasNeighbour(Shape shape, int direction) {
-        for (Square[] squareArray : currentShape.squareMatrix) {
+        for (Square[] squareArray : shape.squareMatrix) {
             for (Square square : squareArray) {
                 if (square.getColor() != null) {
                     int x = square.getX();
                     int y = square.getY();
                     switch (direction) {
-                        case 0: //check left
-                            if (square.getX() >= 9 || board[square.getY()][square.getX() + 1] != null) {
+                        case 0: //check right
+                            if (x >= 9 || board[y][x + 1] != null) {
                                 return true;
                             }
                             break;
-                        case 1: //check right
-                            if (x == 0 || board[y][x - 1] != null) {
+                        case 1: //check left
+                            if (x <= 0 || board[y][x - 1] != null) {
                                 return true;
                             }
                             break;
                         case 2: //check bottom
-                            if (y >= board.length - 1 || board[y + 1][x] != null) {
+                            if (y >= 19 || board[y + 1][x] != null) {
                                 return true;
                             }
                             break;
                         default:
-                            throw new IllegalArgumentException("Invalid dircetion");
+                            throw new IllegalArgumentException("Invalid direction");
                     }
                 }
             }
