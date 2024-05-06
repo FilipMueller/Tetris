@@ -2,7 +2,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.*;
 import java.util.Arrays;
 
 public class Board  extends JPanel implements KeyListener {
@@ -41,11 +40,11 @@ public class Board  extends JPanel implements KeyListener {
 
     private final Square[][] board = new Square[BOARD_HEIGHT][BOARD_WIDTH];
 
-    Shape currentShape = new Shape();
+    private Shape currentShape = new Shape();
 
     private int paintBackground = 0;
 
-    Timer looper;
+    private final Timer looper;
 
     public Board() {
         looper = new Timer(delay, _ -> {
@@ -65,32 +64,6 @@ public class Board  extends JPanel implements KeyListener {
 
         });
         looper.start();
-    }
-
-    public void writeHighscoreToCSV(int score) {
-        try(FileWriter writer = new FileWriter("src/highscore.txt")) {
-            writer.append(String.valueOf(score));
-        } catch (IOException e) {
-            throw new RuntimeException("WRITE FAILED");
-        }
-    }
-
-    public int readHighscoreFromCSV() {
-        int highscore = 0;
-        try (InputStream inputStream = getClass().getResourceAsStream("/highscore.txt")) {
-            if (inputStream != null) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                String line = reader.readLine();
-                if (line != null) {
-                    highscore = Integer.parseInt(line.trim());
-                }
-            } else {
-                throw new RuntimeException("File not found");
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("ERROR reading File");
-        }
-        return highscore;
     }
 
     @Override
@@ -116,19 +89,19 @@ public class Board  extends JPanel implements KeyListener {
             NORMAL--;
         }
 
-        if (readHighscoreFromCSV() < score) {
-            writeHighscoreToCSV(score);
+        if (HighScoreDBManager.loadHighScore() < score) {
+            HighScoreDBManager.saveHighScore(score);
         }
 
         g.setColor(Color.YELLOW);
         g.setFont(fontScore);
         g.drawString("Highscore", 315, 150);
-        g.drawString(readHighscoreFromCSV() + "", 315, 175);
+        g.drawString(HighScoreDBManager.loadHighScore() + "", 315, 175);
         g.setColor(Color.WHITE);
         g.drawString("Score", 315, 300);
         g.drawString(score + "", 315, 325);
         g.setFont(fontp);
-        g.drawString( "'w' = pause", 315, 480);
+        g.drawString( "'p' = pause", 315, 480);
 
         checkIfRowIsFilled();
         drawBoard(g);
