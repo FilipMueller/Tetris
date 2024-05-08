@@ -132,9 +132,20 @@ public class Board  extends JPanel implements KeyListener {
         g.setColor(Color.RED);
         g.drawString("GAME OVER", 50, 280);
         g.setFont(fontTwo);
+        g.setColor(Color.BLACK);
+        g.drawString(score + "", 160, 324);
+        g.drawString(score + "", 159, 325);
+        g.drawString(score + "", 160, 326);
+        g.drawString(score + "", 161, 325);
         g.setColor(Color.YELLOW);
-        g.drawString(score + "", 200, 325);
-        g.drawString( "'r' = restart", 100, 360);
+        g.drawString(score + "", 160, 325);
+        g.setColor(Color.BLACK);
+        g.drawString( "'R' = Restart", 100, 359);
+        g.drawString( "'R' = Restart", 99, 360);
+        g.drawString( "'R' = Restart", 100, 361);
+        g.drawString( "'R' = Restart", 101, 360);
+        g.setColor(Color.YELLOW);
+        g.drawString( "'R' = Restart", 100, 360);
     }
 
     public void resetBoard() {

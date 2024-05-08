@@ -19,7 +19,7 @@ public class Shape {
 
 
     public Shape() {
-        random = (int) (Math.random() * 7);
+        random = 3;
         squareMatrix = getSquareMatrix(random);
     }
 
