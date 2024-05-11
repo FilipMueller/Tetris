@@ -3,6 +3,8 @@
     <output-path>$PROJECT_DIR$/out/artifacts/Tetris_jar</output-path>
     <root id="archive" name="Tetris.jar">
       <element id="module-output" name="Tetris" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/xerial/sqlite-jdbc/3.45.3.0/sqlite-jdbc-3.45.3.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

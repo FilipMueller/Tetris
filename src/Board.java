@@ -49,7 +49,7 @@ public class Board  extends JPanel implements KeyListener {
     public Board() {
         looper = new Timer(delay, _ -> {
             if (System.currentTimeMillis() - beginTime > delayTimeForMovement) {
-                if (!checkIfHasNeighbour(currentShape, 2) && !pause) currentShape.moveDown();
+                if (!checkIfShapeHasNeighbour(currentShape, 2) && !pause) currentShape.moveDown();
                 beginTime = System.currentTimeMillis();
             }
             if (!pause) {
@@ -79,8 +79,8 @@ public class Board  extends JPanel implements KeyListener {
             g.fillRect(0, 0, 300, 600);
         }
 
-        if (checkIfHasNeighbour(currentShape, 2)) {
-            fillArray();
+        if (checkIfShapeHasNeighbour(currentShape, 2)) {
+            fillBoard();
             currentShape = new Shape();
             if (board[0][5] != null) {
                 gameover(g);
@@ -103,10 +103,9 @@ public class Board  extends JPanel implements KeyListener {
         g.setFont(fontp);
         g.drawString( "'p' = pause", 315, 480);
 
-        checkIfRowIsFilled();
+        checkIfBoardHasFilledRow();
         drawBoard(g);
         currentShape.draw(g);
-
         drawGameField(g);
 
         if (pause) {
@@ -140,19 +139,14 @@ public class Board  extends JPanel implements KeyListener {
         g.setColor(Color.YELLOW);
         g.drawString(score + "", 160, 325);
         g.setColor(Color.BLACK);
-        g.drawString( "'R' = Restart", 100, 359);
-        g.drawString( "'R' = Restart", 99, 360);
-        g.drawString( "'R' = Restart", 100, 361);
-        g.drawString( "'R' = Restart", 101, 360);
+        g.drawString( "'R' = Restart", 80, 359);
+        g.drawString( "'R' = Restart", 79, 360);
+        g.drawString( "'R' = Restart", 80, 361);
+        g.drawString( "'R' = Restart", 81, 360);
         g.setColor(Color.YELLOW);
-        g.drawString( "'R' = Restart", 100, 360);
+        g.drawString( "'R' = Restart", 80, 360);
     }
 
-    public void resetBoard() {
-        for (Square[] squares : board) {
-            Arrays.fill(squares, null);
-        }
-    }
 
     public void drawGameField(Graphics g) {
         g.setColor(Color.WHITE);
@@ -194,7 +188,7 @@ public class Board  extends JPanel implements KeyListener {
                 }
             }
         }
-        if (!checkIfHasNeighbour(tempShape, 0) && !checkIfHasNeighbour(tempShape, 1) && !checkIfHasNeighbour(tempShape, 2)) {
+        if (!checkIfShapeHasNeighbour(tempShape, 0) && !checkIfShapeHasNeighbour(tempShape, 1) && !checkIfShapeHasNeighbour(tempShape, 2)) {
             for (int i = 0; i < currentShape.squareMatrix.length; i++) {
                 for (int j = 0; j < currentShape.squareMatrix[0].length; j++) {
                     if (currentShape.squareMatrix[i][j].getColor() != null) {
@@ -206,54 +200,7 @@ public class Board  extends JPanel implements KeyListener {
         }
     }
 
-    public void checkIfRowIsFilled() {
-        int rowNumber = 0;
-        for (Square[] squareArray : board) {
-            int filledSquares = 0;
-            for (Square square : squareArray) {
-                if (square != null) {
-                    filledSquares++;
-                }
-            }
-            if (filledSquares == 10) {
-                emptyFilledRow(rowNumber);
-            }
-            rowNumber++;
-        }
-    }
-
-    public void emptyFilledRow(int rowNumber) {
-        for (int i = 0; i < 10; i++) {
-            board[rowNumber][i] = null;
-        }
-
-        score += 100;
-
-        for (int i = rowNumber - 1; i >= 0; i--) {
-            for (int j = 0; j < 10; j++) {
-                if (board[i][j] != null) {
-                    board[i + 1][j] = new Square(board[i][j].getColor());
-                    board[i + 1][j].setX(board[i][j].getX());
-                    board[i + 1][j].setY(board[i][j].getY() + 1);
-                    board[i][j] = null;
-                }
-            }
-        }
-    }
-
-
-    public void drawBoard(Graphics g) {
-        for (int row = 0; row < board.length; row++) {
-            for (int col = 0; col < board[0].length; col++) {
-                if (board[row][col] != null) {
-                    g.setColor(board[row][col].getColor());
-                    g.fillRect(board[row][col].getX() * BLOCK_SIZE, board[row][col].getY() * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-                }
-            }
-        }
-    }
-
-    public boolean checkIfHasNeighbour(Shape shape, int direction) {
+    public boolean checkIfShapeHasNeighbour(Shape shape, int direction) {
         for (Square[] squareArray : shape.squareMatrix) {
             for (Square square : squareArray) {
                 if (square.getColor() != null) {
@@ -284,7 +231,59 @@ public class Board  extends JPanel implements KeyListener {
         return false;
     }
 
-    public void fillArray() {
+    public void checkIfBoardHasFilledRow() {
+        int rowNumber = 0;
+        for (Square[] squareArray : board) {
+            int filledSquares = 0;
+            for (Square square : squareArray) {
+                if (square != null) {
+                    filledSquares++;
+                }
+            }
+            if (filledSquares == 10) {
+                emptyFilledRow(rowNumber);
+            }
+            rowNumber++;
+        }
+    }
+
+    private void emptyFilledRow(int rowNumber) {
+        for (int i = 0; i < 10; i++) {
+            board[rowNumber][i] = null;
+        }
+
+        score += 100;
+
+        for (int i = rowNumber - 1; i >= 0; i--) {
+            for (int j = 0; j < 10; j++) {
+                if (board[i][j] != null) {
+                    board[i + 1][j] = new Square(board[i][j].getColor());
+                    board[i + 1][j].setX(board[i][j].getX());
+                    board[i + 1][j].setY(board[i][j].getY() + 1);
+                    board[i][j] = null;
+                }
+            }
+        }
+    }
+
+    public void resetBoard() {
+        for (Square[] squares : board) {
+            Arrays.fill(squares, null);
+        }
+    }
+
+    public void drawBoard(Graphics g) {
+        for (int row = 0; row < board.length; row++) {
+            for (int col = 0; col < board[0].length; col++) {
+                if (board[row][col] != null) {
+                    g.setColor(board[row][col].getColor());
+                    g.fillRect(board[row][col].getX() * BLOCK_SIZE, board[row][col].getY() * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                }
+            }
+        }
+    }
+
+    public void fillBoard() {
         for (Square[] squareArray : currentShape.squareMatrix) {
             for (Square square : squareArray) {
                 int x = square.getX();
@@ -312,13 +311,13 @@ public class Board  extends JPanel implements KeyListener {
         if (e.getKeyCode() == KeyEvent.VK_E && !pause) {
             rotate(0);
         }
-        if (e.getKeyCode() == KeyEvent.VK_A && (!checkIfHasNeighbour(currentShape, 1)) && !pause) {
+        if (e.getKeyCode() == KeyEvent.VK_A && !checkIfShapeHasNeighbour(currentShape, 1) && !pause) {
             currentShape.moveLeft();
         }
-        if (e.getKeyCode() == KeyEvent.VK_D && (!checkIfHasNeighbour(currentShape, 0)) && !pause) {
+        if (e.getKeyCode() == KeyEvent.VK_D && !checkIfShapeHasNeighbour(currentShape, 0) && !pause) {
             currentShape.moveRight();
         }
-        if (e.getKeyCode() == KeyEvent.VK_S && !checkIfHasNeighbour(currentShape, 2) && !pause) {
+        if (e.getKeyCode() == KeyEvent.VK_S && !checkIfShapeHasNeighbour(currentShape, 2) && !pause) {
             delayTimeForMovement = FAST;
         }
         if (e.getKeyCode() == KeyEvent.VK_P) {

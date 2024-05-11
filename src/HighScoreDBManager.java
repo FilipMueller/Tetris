@@ -17,6 +17,7 @@ public class HighScoreDBManager {
                 stmt.executeUpdate("INSERT INTO HighScores(score) VALUES(0)");
             }
         } catch (SQLException e) {
+            System.err.println("An error occurred during database initialization");
             e.printStackTrace();
         }
     }
@@ -27,6 +28,7 @@ public class HighScoreDBManager {
             pstmt.setInt(1, score);
             pstmt.executeUpdate();
         } catch (SQLException e) {
+            System.err.println("An error occurred while saving the highscore");
             e.printStackTrace();
         }
     }
@@ -40,6 +42,7 @@ public class HighScoreDBManager {
                 highScore = rs.getInt("maxScore");
             }
         } catch (SQLException e) {
+            System.err.println("An error occurred while reading the highscore");
             e.printStackTrace();
         }
         return highScore;
