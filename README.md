@@ -2,4 +2,4 @@ Still has some issues, but you can already play it!
 
 Download:
 
-https://drive.google.com/file/d/1DOP-3tpiPStauK7N4w6qzF--RdC8xlMs/view?usp=drive_link
+https://drive.google.com/drive/folders/154dpvh5iJlbF_XmHfJlYqY-h8X3Z4pH8?usp=drive_link
