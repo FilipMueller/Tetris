@@ -82,7 +82,7 @@ public class Board  extends JPanel implements KeyListener {
         if (checkIfShapeHasNeighbour(currentShape, 2)) {
             fillBoard();
             currentShape = new Shape();
-            if (board[0][5] != null) {
+            if (boardLimitReached()) {
                 gameover(g);
                 return;
             }
@@ -101,7 +101,7 @@ public class Board  extends JPanel implements KeyListener {
         g.drawString("Score", 315, 300);
         g.drawString(score + "", 315, 325);
         g.setFont(fontp);
-        g.drawString( "'p' = pause", 315, 480);
+        g.drawString( "'P' = pause", 315, 480);
 
         checkIfBoardHasFilledRow();
         drawBoard(g);
@@ -117,6 +117,7 @@ public class Board  extends JPanel implements KeyListener {
 
     public void gameover(Graphics g) {
         gameIsOver = true;
+        score = 0;
         looper.stop();
         drawGameField(g);
         drawBoard(g);
@@ -264,6 +265,15 @@ public class Board  extends JPanel implements KeyListener {
                 }
             }
         }
+    }
+
+    public boolean boardLimitReached() {
+        for (int i = 3; i < 7; i++) {
+            if (board[0][i] != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void resetBoard() {
