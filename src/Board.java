@@ -46,10 +46,12 @@ public class Board  extends JPanel implements KeyListener {
 
     private final Timer looper;
 
+    private Square[][] I_OFFSET_DATA = new Square[4][5];
+
     public Board() {
         looper = new Timer(delay, _ -> {
             if (System.currentTimeMillis() - beginTime > delayTimeForMovement) {
-                if (!checkIfShapeHasNeighbour(currentShape, 2) && !pause) currentShape.moveDown();
+                //if (!checkIfShapeHasNeighbour(currentShape, 2) && !pause) currentShape.moveDown();
                 beginTime = System.currentTimeMillis();
             }
             if (!pause) {
@@ -66,9 +68,79 @@ public class Board  extends JPanel implements KeyListener {
         looper.start();
     }
 
+    private void Awake()
+    {
+
+        I_OFFSET_DATA[0][0] = new Square(null);
+        I_OFFSET_DATA[0][0].setX(0);
+        I_OFFSET_DATA[0][0].setY(0);
+        I_OFFSET_DATA[0][1] = new Square(null);
+        I_OFFSET_DATA[0][1].setX(-1);
+        I_OFFSET_DATA[0][1].setY(0);
+        I_OFFSET_DATA[0][2] = new Square(null);
+        I_OFFSET_DATA[0][2].setX(2);
+        I_OFFSET_DATA[0][2].setY(0);
+        I_OFFSET_DATA[0][3] = new Square(null);
+        I_OFFSET_DATA[0][3].setX(-1);
+        I_OFFSET_DATA[0][3].setY(0);
+        I_OFFSET_DATA[0][4] = new Square(null);
+        I_OFFSET_DATA[0][4].setX(2);
+        I_OFFSET_DATA[0][4].setY(0);
+
+        I_OFFSET_DATA[1][0] = new Square(null);
+        I_OFFSET_DATA[1][0].setX(-1);
+        I_OFFSET_DATA[1][0].setY(0);
+        I_OFFSET_DATA[1][1] = new Square(null);
+        I_OFFSET_DATA[1][1].setX(0);
+        I_OFFSET_DATA[1][1].setY(0);
+        I_OFFSET_DATA[1][2] = new Square(null);
+        I_OFFSET_DATA[1][2].setX(0);
+        I_OFFSET_DATA[1][2].setY(0);
+        I_OFFSET_DATA[1][3] = new Square(null);
+        I_OFFSET_DATA[1][3].setX(0);
+        I_OFFSET_DATA[1][3].setY(1);
+        I_OFFSET_DATA[1][4] = new Square(null);
+        I_OFFSET_DATA[1][4].setX(0);
+        I_OFFSET_DATA[1][4].setY(-2);
+
+        I_OFFSET_DATA[2][0] = new Square(null);
+        I_OFFSET_DATA[2][0].setX(-1);
+        I_OFFSET_DATA[2][0].setY(1);
+        I_OFFSET_DATA[2][1] = new Square(null);
+        I_OFFSET_DATA[2][1].setX(1);
+        I_OFFSET_DATA[2][1].setY(1);
+        I_OFFSET_DATA[2][2] = new Square(null);
+        I_OFFSET_DATA[2][2].setX(-2);
+        I_OFFSET_DATA[2][2].setY(1);
+        I_OFFSET_DATA[2][3] = new Square(null);
+        I_OFFSET_DATA[2][3].setX(1);
+        I_OFFSET_DATA[2][3].setY(0);
+        I_OFFSET_DATA[2][4] = new Square(null);
+        I_OFFSET_DATA[2][4].setX(-2);
+        I_OFFSET_DATA[2][4].setY(0);
+
+        I_OFFSET_DATA[3][0] = new Square(null);
+        I_OFFSET_DATA[3][0].setX(0);
+        I_OFFSET_DATA[3][0].setY(1);
+        I_OFFSET_DATA[3][1] = new Square(null);
+        I_OFFSET_DATA[3][1].setX(0);
+        I_OFFSET_DATA[3][1].setY(1);
+        I_OFFSET_DATA[3][2] = new Square(null);
+        I_OFFSET_DATA[3][2].setX(0);
+        I_OFFSET_DATA[3][2].setY(1);
+        I_OFFSET_DATA[3][3] = new Square(null);
+        I_OFFSET_DATA[3][3].setX(0);
+        I_OFFSET_DATA[3][3].setY(-1);
+        I_OFFSET_DATA[3][4] = new Square(null);
+        I_OFFSET_DATA[3][4].setX(0);
+        I_OFFSET_DATA[3][4].setY(2);
+
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        Awake();
         Font fontScore = new Font("fontScore", Font.PLAIN, 20);
         Font fontp = new Font("fontp", Font.PLAIN, 16);
         Font fontPause = new Font("fontPause", Font.BOLD, 50);
@@ -159,44 +231,79 @@ public class Board  extends JPanel implements KeyListener {
         }
     }
 
+
+
     public void rotate(int direction) {
         int row = Integer.parseInt(currentShape.centerPoint.substring(0, 1));
         int col = Integer.parseInt(currentShape.centerPoint.substring(1));
         int centerX = currentShape.squareMatrix[row][col].getX();
         int centerY = currentShape.squareMatrix[row][col].getY();
 
-        Shape tempShape = new Shape(currentShape.random);
-        tempShape.centerPoint = currentShape.centerPoint;
+        final int oldRotationIndex = currentShape.currentRotation;
 
-        for (int i = 0; i < currentShape.squareMatrix.length; i++) {
-            for (int j = 0; j < currentShape.squareMatrix[0].length; j++) {
-                if (currentShape.squareMatrix[i][j].getColor() != null) {
-                    int x = currentShape.squareMatrix[i][j].getX() - centerX;
-                    int y = currentShape.squareMatrix[i][j].getY() - centerY;
-                    int newX;
-                    int newY;
-
-                    if (direction == 1) {
-                        newX = (xRotationCounterClockwise[0] * x) + (xRotationCounterClockwise[1] * y);
-                        newY = (yRotationCounterClockwise[0] * x) + (yRotationCounterClockwise[1] * y);
-                    } else {
-                        newX = (xRotationClockwise[0] * x) + (xRotationClockwise[1] * y);
-                        newY = (yRotationClockwise[0] * x) + (yRotationClockwise[1] * y);
-                    }
-
-                    tempShape.squareMatrix[i][j].setX(newX + centerX);
-                    tempShape.squareMatrix[i][j].setY(newY + centerY);
-                }
+        if (direction == 1) {
+            if (currentShape.currentRotation == 0) {
+                currentShape.currentRotation = 3;
+            } else {
+                currentShape.currentRotation -= 1;
+            }
+        } else {
+            if (currentShape.currentRotation == 3) {
+                currentShape.currentRotation = 0;
+            } else {
+                currentShape.currentRotation += 1;
             }
         }
-        if (!checkIfShapeHasNeighbour(tempShape, 0) && !checkIfShapeHasNeighbour(tempShape, 1) && !checkIfShapeHasNeighbour(tempShape, 2)) {
+
+        final int newRotationIndex = currentShape.currentRotation;
+
+        Shape tempShape = new Shape(currentShape.random, currentShape.currentRotation);
+        tempShape.centerPoint = currentShape.centerPoint;
+        for (int testIndex = 0; testIndex < 4; testIndex++) {
             for (int i = 0; i < currentShape.squareMatrix.length; i++) {
                 for (int j = 0; j < currentShape.squareMatrix[0].length; j++) {
                     if (currentShape.squareMatrix[i][j].getColor() != null) {
-                        currentShape.squareMatrix[i][j].setX(tempShape.squareMatrix[i][j].getX());
-                        currentShape.squareMatrix[i][j].setY(tempShape.squareMatrix[i][j].getY());
+                        int relativeX = currentShape.squareMatrix[i][j].getX() - centerX;
+                        int relativeY = currentShape.squareMatrix[i][j].getY() - centerY;
+                        int newX;
+                        int newY;
+
+
+                        if (direction == 1) {
+                            newX = (xRotationCounterClockwise[0] * relativeX) + (xRotationCounterClockwise[1] * relativeY);
+                            newY = (yRotationCounterClockwise[0] * relativeX) + (yRotationCounterClockwise[1] * relativeY);
+                        } else {
+                            newX = (xRotationClockwise[0] * relativeX) + (xRotationClockwise[1] * relativeY);
+                            newY = (yRotationClockwise[0] * relativeX) + (yRotationClockwise[1] * relativeY);
+                        }
+
+                        Square offset1 = I_OFFSET_DATA[oldRotationIndex][testIndex];
+                        Square offset2 = I_OFFSET_DATA[newRotationIndex][testIndex];
+                        int offset1XCoord = offset1.getX();
+                        int offset1YCoord = offset1.getY();
+
+                        int offset2XCoord = offset2.getX();
+                        int offset2YCoord = offset2.getY();
+
+                        int endOffsetX = offset1XCoord - offset2XCoord;
+                        int endOffsetY = offset1YCoord - offset2YCoord;
+
+
+                        tempShape.squareMatrix[i][j].setX(newX + centerX + endOffsetX);
+                        tempShape.squareMatrix[i][j].setY(newY + centerY + endOffsetY);
                     }
                 }
+            }
+            if (!checkIfShapeHasNeighbour(tempShape, 0) && !checkIfShapeHasNeighbour(tempShape, 1) && !checkIfShapeHasNeighbour(tempShape, 2)) {
+                for (int i = 0; i < currentShape.squareMatrix.length; i++) {
+                    for (int j = 0; j < currentShape.squareMatrix[0].length; j++) {
+                        if (currentShape.squareMatrix[i][j].getColor() != null) {
+                            currentShape.squareMatrix[i][j].setX(tempShape.squareMatrix[i][j].getX());
+                            currentShape.squareMatrix[i][j].setY(tempShape.squareMatrix[i][j].getY());
+                        }
+                    }
+                }
+                return;
             }
         }
     }
@@ -209,7 +316,7 @@ public class Board  extends JPanel implements KeyListener {
                     int y = square.getY();
                     switch (direction) {
                         case 0: //check right
-                            if (x >= 9 || board[y][x + 1] != null) {
+                            if (x > 9 || board[y][x + 1] != null) {
                                 return true;
                             }
                             break;

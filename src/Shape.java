@@ -12,14 +12,18 @@ public class Shape {
 
     int random;
 
-    public Shape(int random) {
+    int currentRotation;
+
+    public Shape(int random, int currentRotation) {
         this.random = random;
+        this.currentRotation = currentRotation;
         squareMatrix = getSquareMatrix(random);
     }
 
 
     public Shape() {
-        random = (int) (Math.random() * 7);;
+        random = (int) (Math.random() * 1);;
+        this.currentRotation = 0;
         squareMatrix = getSquareMatrix(random);
     }
 
@@ -90,7 +94,7 @@ public class Shape {
                     g.setColor(squareMatrix[row][col].getColor());
                     if (initialSpawn) {
                         squareMatrix[row][col].setX(col + 4);
-                        squareMatrix[row][col].setY(row);
+                        squareMatrix[row][col].setY(row + 7);
                     }
                     if (!initialSpawn) {
                         g.fillRect(squareMatrix[row][col].getX() * BLOCK_SIZE, squareMatrix[row][col].getY() * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
