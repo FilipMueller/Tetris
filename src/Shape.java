@@ -8,81 +8,82 @@ public class Shape {
 
     private static final int BLOCK_SIZE = 30;
 
-    String centerPoint;
+    private static final Square[][] I_OFFSET_DATA = new Square[4][5];
 
-    int random;
+    private static final Square[][] O_OFFSET_DATA = new Square[4][1];
 
-    int currentRotation;
+    private static final Square[][] JLSTZ_OFFSET_DATA = new Square[4][5];
 
-    public Shape(int random, int currentRotation) {
-        this.random = random;
-        this.currentRotation = currentRotation;
-        squareMatrix = getSquareMatrix(random);
+    private final ShapeType shapeType;
+
+    private String centerPoint;
+
+    private int rotationIndex;
+
+    public Shape(ShapeType shapeType, int currentRotation) {
+        this.shapeType = shapeType;
+        this.rotationIndex = currentRotation;
+        squareMatrix = getSquareMatrix(shapeType);
     }
-
 
     public Shape() {
-        random = (int) (Math.random() * 1);;
-        this.currentRotation = 0;
-        squareMatrix = getSquareMatrix(random);
+        this.shapeType = ShapeType.values() [(int) (Math.random() * ShapeType.values().length)];
+        this.rotationIndex = 0;
+        squareMatrix = getSquareMatrix(shapeType);
     }
 
-    private Square[][] getSquareMatrix(int random) {
+    private Square[][] getSquareMatrix(ShapeType shapeType) {
         final Square[][] squareMatrix;
-        if (random == 0) {
-            squareMatrix = new Square[][]{
-                    {new Square(Color.CYAN), new Square(Color.CYAN), new Square(Color.CYAN), new Square(Color.CYAN)}
-            };
-            this.random = 0;
-            this.centerPoint = "01";
-        }
-        else if (random == 1) {
-            squareMatrix = new Square[][]{
-                    {new Square(Color.BLUE), new Square(null), new Square(null)},
-                    {new Square(Color.BLUE), new Square(Color.BLUE), new Square(Color.BLUE)}
-            };
-            this.random = 1;
-            this.centerPoint = "11";
-        }
-        else if (random == 2) {
-            squareMatrix = new Square[][]{
-                    {new Square(null), new Square(null), new Square(Color.ORANGE)},
-                    {new Square(Color.ORANGE), new Square(Color.ORANGE), new Square(Color.ORANGE)}
-            };
-            this.random = 2;
-            this.centerPoint = "11";
-        }
-        else if (random == 3) {
-            squareMatrix = new Square[][]{
-                    {new Square(Color.YELLOW), new Square(Color.YELLOW)},
-                    {new Square(Color.YELLOW), new Square(Color.YELLOW)}
-            };
-            this.random = 3;
-            this.centerPoint = "10";
-        }
-        else if (random == 4) {
-            squareMatrix = new Square[][]{
-                    {new Square(null), new Square(Color.GREEN), new Square(Color.GREEN)},
-                    {new Square(Color.GREEN), new Square(Color.GREEN), new Square(null)}
-            };
-            this.random = 4;
-            this.centerPoint = "11";
-        }
-        else if (random == 5) {
-            squareMatrix = new Square[][]{
-                    {new Square(null), new Square(Color.PINK), new Square(null)},
-                    {new Square(Color.PINK), new Square(Color.PINK), new Square(Color.PINK)}
-            };
-            this.random = 5;
-            this.centerPoint = "11";
-        }
-        else {
-            squareMatrix = new Square[][]{
-                    {new Square(Color.RED), new Square(Color.RED), new Square(null)},
-                    {new Square(null), new Square(Color.RED), new Square(Color.RED)}
-            };
-            this.random = 6;
-            this.centerPoint = "11";
+        switch (shapeType) {
+            case I_Shape:
+                squareMatrix = new Square[][]{
+                        {new Square(Color.CYAN), new Square(Color.CYAN), new Square(Color.CYAN), new Square(Color.CYAN)}
+                };
+                this.centerPoint = "01";
+                break;
+            case J_Shape:
+                squareMatrix = new Square[][]{
+                        {new Square(Color.BLUE), new Square(null), new Square(null)},
+                        {new Square(Color.BLUE), new Square(Color.BLUE), new Square(Color.BLUE)}
+                };
+                this.centerPoint = "11";
+                break;
+            case L_Shape:
+                squareMatrix = new Square[][]{
+                        {new Square(null), new Square(null), new Square(Color.ORANGE)},
+                        {new Square(Color.ORANGE), new Square(Color.ORANGE), new Square(Color.ORANGE)}
+                };
+                this.centerPoint = "11";
+                break;
+            case O_Shape:
+                squareMatrix = new Square[][]{
+                        {new Square(Color.YELLOW), new Square(Color.YELLOW)},
+                        {new Square(Color.YELLOW), new Square(Color.YELLOW)}
+                };
+                this.centerPoint = "10";
+                break;
+            case S_Shape:
+                squareMatrix = new Square[][]{
+                        {new Square(null), new Square(Color.GREEN), new Square(Color.GREEN)},
+                        {new Square(Color.GREEN), new Square(Color.GREEN), new Square(null)}
+                };
+                this.centerPoint = "11";
+                break;
+            case T_Shape:
+                squareMatrix = new Square[][]{
+                        {new Square(null), new Square(Color.PINK), new Square(null)},
+                        {new Square(Color.PINK), new Square(Color.PINK), new Square(Color.PINK)}
+                };
+                this.centerPoint = "11";
+                break;
+            case Z_Shape:
+            default:
+                squareMatrix = new Square[][]{
+                        {new Square(Color.RED), new Square(Color.RED), new Square(null)},
+                        {new Square(null), new Square(Color.RED), new Square(Color.RED)}
+                };
+                this.centerPoint = "11";
+                break;
         }
         return squareMatrix;
     }
@@ -94,7 +95,7 @@ public class Shape {
                     g.setColor(squareMatrix[row][col].getColor());
                     if (initialSpawn) {
                         squareMatrix[row][col].setX(col + 4);
-                        squareMatrix[row][col].setY(row + 7);
+                        squareMatrix[row][col].setY(row);
                     }
                     if (!initialSpawn) {
                         g.fillRect(squareMatrix[row][col].getX() * BLOCK_SIZE, squareMatrix[row][col].getY() * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
@@ -133,5 +134,182 @@ public class Shape {
                 }
             }
         }
+    }
+
+    public Square[][] getSquareMatrix() {
+        return squareMatrix;
+    }
+
+    public ShapeType getShapeType() {
+        return shapeType;
+    }
+
+    public String getCenterPoint() {
+        return centerPoint;
+    }
+
+    public void setCenterPoint(String centerPoint) {
+        this.centerPoint = centerPoint;
+    }
+
+    public int getRotationIndex() {
+        return rotationIndex;
+    }
+
+    public void setRotationIndex(int rotationIndex) {
+        this.rotationIndex = rotationIndex;
+    }
+
+    public static Square[][] getOOffset() {
+        O_OFFSET_DATA[0][0] = new Square(null);
+        O_OFFSET_DATA[0][0].setX(0);
+        O_OFFSET_DATA[0][0].setY(0);
+        O_OFFSET_DATA[1][0] = new Square(null);
+        O_OFFSET_DATA[1][0].setX(0);
+        O_OFFSET_DATA[1][0].setY(1);
+        O_OFFSET_DATA[2][0] = new Square(null);
+        O_OFFSET_DATA[2][0].setX(-1);
+        O_OFFSET_DATA[2][0].setY(1);
+        O_OFFSET_DATA[3][0] = new Square(null);
+        O_OFFSET_DATA[3][0].setX(-1);
+        O_OFFSET_DATA[3][0].setY(0);
+
+        return O_OFFSET_DATA;
+    }
+
+    public static Square[][] getJLSTZOffset() {
+        JLSTZ_OFFSET_DATA[0][0] = new Square(null);
+        JLSTZ_OFFSET_DATA[0][0].setX(0);
+        JLSTZ_OFFSET_DATA[0][0].setY(0);
+        JLSTZ_OFFSET_DATA[0][1] = new Square(null);
+        JLSTZ_OFFSET_DATA[0][1].setX(0);
+        JLSTZ_OFFSET_DATA[0][1].setY(0);
+        JLSTZ_OFFSET_DATA[0][2] = new Square(null);
+        JLSTZ_OFFSET_DATA[0][2].setX(0);
+        JLSTZ_OFFSET_DATA[0][2].setY(0);
+        JLSTZ_OFFSET_DATA[0][3] = new Square(null);
+        JLSTZ_OFFSET_DATA[0][3].setX(0);
+        JLSTZ_OFFSET_DATA[0][3].setY(0);
+        JLSTZ_OFFSET_DATA[0][4] = new Square(null);
+        JLSTZ_OFFSET_DATA[0][4].setX(0);
+        JLSTZ_OFFSET_DATA[0][4].setY(0);
+
+        JLSTZ_OFFSET_DATA[1][0] = new Square(null);
+        JLSTZ_OFFSET_DATA[1][0].setX(0);
+        JLSTZ_OFFSET_DATA[1][0].setY(0);
+        JLSTZ_OFFSET_DATA[1][1] = new Square(null);
+        JLSTZ_OFFSET_DATA[1][1].setX(1);
+        JLSTZ_OFFSET_DATA[1][1].setY(0);
+        JLSTZ_OFFSET_DATA[1][2] = new Square(null);
+        JLSTZ_OFFSET_DATA[1][2].setX(1);
+        JLSTZ_OFFSET_DATA[1][2].setY(1);
+        JLSTZ_OFFSET_DATA[1][3] = new Square(null);
+        JLSTZ_OFFSET_DATA[1][3].setX(0);
+        JLSTZ_OFFSET_DATA[1][3].setY(-2);
+        JLSTZ_OFFSET_DATA[1][4] = new Square(null);
+        JLSTZ_OFFSET_DATA[1][4].setX(1);
+        JLSTZ_OFFSET_DATA[1][4].setY(-2);
+
+        JLSTZ_OFFSET_DATA[2][0] = new Square(null);
+        JLSTZ_OFFSET_DATA[2][0].setX(0);
+        JLSTZ_OFFSET_DATA[2][0].setY(0);
+        JLSTZ_OFFSET_DATA[2][1] = new Square(null);
+        JLSTZ_OFFSET_DATA[2][1].setX(0);
+        JLSTZ_OFFSET_DATA[2][1].setY(0);
+        JLSTZ_OFFSET_DATA[2][2] = new Square(null);
+        JLSTZ_OFFSET_DATA[2][2].setX(0);
+        JLSTZ_OFFSET_DATA[2][2].setY(0);
+        JLSTZ_OFFSET_DATA[2][3] = new Square(null);
+        JLSTZ_OFFSET_DATA[2][3].setX(0);
+        JLSTZ_OFFSET_DATA[2][3].setY(0);
+        JLSTZ_OFFSET_DATA[2][4] = new Square(null);
+        JLSTZ_OFFSET_DATA[2][4].setX(0);
+        JLSTZ_OFFSET_DATA[2][4].setY(0);
+
+        JLSTZ_OFFSET_DATA[3][0] = new Square(null);
+        JLSTZ_OFFSET_DATA[3][0].setX(0);
+        JLSTZ_OFFSET_DATA[3][0].setY(0);
+        JLSTZ_OFFSET_DATA[3][1] = new Square(null);
+        JLSTZ_OFFSET_DATA[3][1].setX(-1);
+        JLSTZ_OFFSET_DATA[3][1].setY(0);
+        JLSTZ_OFFSET_DATA[3][2] = new Square(null);
+        JLSTZ_OFFSET_DATA[3][2].setX(-1);
+        JLSTZ_OFFSET_DATA[3][2].setY(1);
+        JLSTZ_OFFSET_DATA[3][3] = new Square(null);
+        JLSTZ_OFFSET_DATA[3][3].setX(0);
+        JLSTZ_OFFSET_DATA[3][3].setY(2);
+        JLSTZ_OFFSET_DATA[3][4] = new Square(null);
+        JLSTZ_OFFSET_DATA[3][4].setX(-1);
+        JLSTZ_OFFSET_DATA[3][4].setY(-2);
+
+        return JLSTZ_OFFSET_DATA;
+    }
+
+    public static Square[][] getIOffset() {
+        I_OFFSET_DATA[0][0] = new Square(null);
+        I_OFFSET_DATA[0][0].setX(0);
+        I_OFFSET_DATA[0][0].setY(0);
+        I_OFFSET_DATA[0][1] = new Square(null);
+        I_OFFSET_DATA[0][1].setX(-1);
+        I_OFFSET_DATA[0][1].setY(0);
+        I_OFFSET_DATA[0][2] = new Square(null);
+        I_OFFSET_DATA[0][2].setX(2);
+        I_OFFSET_DATA[0][2].setY(0);
+        I_OFFSET_DATA[0][3] = new Square(null);
+        I_OFFSET_DATA[0][3].setX(-1);
+        I_OFFSET_DATA[0][3].setY(0);
+        I_OFFSET_DATA[0][4] = new Square(null);
+        I_OFFSET_DATA[0][4].setX(2);
+        I_OFFSET_DATA[0][4].setY(0);
+
+        I_OFFSET_DATA[1][0] = new Square(null);
+        I_OFFSET_DATA[1][0].setX(-1);
+        I_OFFSET_DATA[1][0].setY(0);
+        I_OFFSET_DATA[1][1] = new Square(null);
+        I_OFFSET_DATA[1][1].setX(0);
+        I_OFFSET_DATA[1][1].setY(0);
+        I_OFFSET_DATA[1][2] = new Square(null);
+        I_OFFSET_DATA[1][2].setX(0);
+        I_OFFSET_DATA[1][2].setY(0);
+        I_OFFSET_DATA[1][3] = new Square(null);
+        I_OFFSET_DATA[1][3].setX(0);
+        I_OFFSET_DATA[1][3].setY(-1);
+        I_OFFSET_DATA[1][4] = new Square(null);
+        I_OFFSET_DATA[1][4].setX(0);
+        I_OFFSET_DATA[1][4].setY(2);
+
+        I_OFFSET_DATA[2][0] = new Square(null);
+        I_OFFSET_DATA[2][0].setX(-1);
+        I_OFFSET_DATA[2][0].setY(-1);
+        I_OFFSET_DATA[2][1] = new Square(null);
+        I_OFFSET_DATA[2][1].setX(1);
+        I_OFFSET_DATA[2][1].setY(-1);
+        I_OFFSET_DATA[2][2] = new Square(null);
+        I_OFFSET_DATA[2][2].setX(-2);
+        I_OFFSET_DATA[2][2].setY(-1);
+        I_OFFSET_DATA[2][3] = new Square(null);
+        I_OFFSET_DATA[2][3].setX(1);
+        I_OFFSET_DATA[2][3].setY(0);
+        I_OFFSET_DATA[2][4] = new Square(null);
+        I_OFFSET_DATA[2][4].setX(-2);
+        I_OFFSET_DATA[2][4].setY(0);
+
+        I_OFFSET_DATA[3][0] = new Square(null);
+        I_OFFSET_DATA[3][0].setX(0);
+        I_OFFSET_DATA[3][0].setY(-1);
+        I_OFFSET_DATA[3][1] = new Square(null);
+        I_OFFSET_DATA[3][1].setX(0);
+        I_OFFSET_DATA[3][1].setY(-1);
+        I_OFFSET_DATA[3][2] = new Square(null);
+        I_OFFSET_DATA[3][2].setX(0);
+        I_OFFSET_DATA[3][2].setY(-1);
+        I_OFFSET_DATA[3][3] = new Square(null);
+        I_OFFSET_DATA[3][3].setX(0);
+        I_OFFSET_DATA[3][3].setY(1);
+        I_OFFSET_DATA[3][4] = new Square(null);
+        I_OFFSET_DATA[3][4].setX(0);
+        I_OFFSET_DATA[3][4].setY(-2);
+
+        return I_OFFSET_DATA;
     }
 }
