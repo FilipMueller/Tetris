@@ -160,7 +160,7 @@ public class Shape {
         this.rotationIndex = rotationIndex;
     }
 
-    public static Square[][] getOOffset() {
+    public static Square[][] getOOffsetData() {
         O_OFFSET_DATA[0][0] = new Square(null);
         O_OFFSET_DATA[0][0].setX(0);
         O_OFFSET_DATA[0][0].setY(0);
@@ -177,7 +177,7 @@ public class Shape {
         return O_OFFSET_DATA;
     }
 
-    public static Square[][] getJLSTZOffset() {
+    public static Square[][] getJLSTZOffsetData() {
         JLSTZ_OFFSET_DATA[0][0] = new Square(null);
         JLSTZ_OFFSET_DATA[0][0].setX(0);
         JLSTZ_OFFSET_DATA[0][0].setY(0);
@@ -245,7 +245,7 @@ public class Shape {
         return JLSTZ_OFFSET_DATA;
     }
 
-    public static Square[][] getIOffset() {
+    public static Square[][] getIOffsetData() {
         I_OFFSET_DATA[0][0] = new Square(null);
         I_OFFSET_DATA[0][0].setX(0);
         I_OFFSET_DATA[0][0].setY(0);

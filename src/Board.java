@@ -70,7 +70,7 @@ public class Board  extends JPanel implements KeyListener {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Font fontScore = new Font("fontScore", Font.PLAIN, 20);
-        Font fontp = new Font("fontp", Font.PLAIN, 16);
+        Font fontPauseKey = new Font("fontPauseKey", Font.PLAIN, 16);
         Font fontPause = new Font("fontPause", Font.BOLD, 50);
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, getWidth(), getHeight());
@@ -100,7 +100,7 @@ public class Board  extends JPanel implements KeyListener {
         g.setColor(Color.WHITE);
         g.drawString("Score", 315, 300);
         g.drawString(score + "", 315, 325);
-        g.setFont(fontp);
+        g.setFont(fontPauseKey);
         g.drawString( "'P' = pause", 315, 480);
 
         checkIfBoardHasFilledRow();
@@ -148,7 +148,6 @@ public class Board  extends JPanel implements KeyListener {
         g.drawString( "'R' = Restart", 80, 360);
     }
 
-
     private void drawGameField(Graphics g) {
         g.setColor(Color.WHITE);
         for (int row = 0; row < BOARD_HEIGHT; row++) {
@@ -159,49 +158,19 @@ public class Board  extends JPanel implements KeyListener {
         }
     }
 
-
-
     private void rotate(boolean direction) {
-        final int row = Integer.parseInt(currentShape.getCenterPoint().substring(0, 1));
-        final int col = Integer.parseInt(currentShape.getCenterPoint().substring(1));
-        final int globalX = currentShape.squareMatrix[row][col].getX();
-        final int globalY = currentShape.squareMatrix[row][col].getY();
-        Square[][] currentOffsetData;
+        final int[] centerCoords = getCenterCoordinates(currentShape);
+        final int globalX = centerCoords[0];
+        final int globalY = centerCoords[1];
 
         final int oldRotationIndex = currentShape.getRotationIndex();
+        final int newRotationIndex = getNewRotationIndex(direction, oldRotationIndex);
+        currentShape.setRotationIndex(newRotationIndex);
 
-        if (direction) {
-            if (currentShape.getRotationIndex() == 3) {
-                currentShape.setRotationIndex(0);
-            } else {
-                currentShape.setRotationIndex(oldRotationIndex + 1);
-            }
-        } else {
-            if (currentShape.getRotationIndex() == 0) {
-                currentShape.setRotationIndex(3);
-            } else {
-                currentShape.setRotationIndex(oldRotationIndex - 1);
-            }
-        }
+        final Square[][] currentOffsetData = getCurrentOffsetData(currentShape.getShapeType());
+        Shape tempShape = createTemporaryShape(currentShape);
 
-        final int newRotationIndex = currentShape.getRotationIndex();
-
-        if(currentShape.getShapeType() == ShapeType.O_Shape) {
-            currentOffsetData = Shape.getOOffset();
-        }
-        else if(currentShape.getShapeType() == ShapeType.I_Shape)
-        {
-            currentOffsetData = Shape.getIOffset();
-        }
-        else
-        {
-            currentOffsetData = Shape.getJLSTZOffset();
-        }
-
-        Shape tempShape = new Shape(currentShape.getShapeType(), currentShape.getRotationIndex());
-        tempShape.setCenterPoint(currentShape.getCenterPoint());
-
-        for (int testIndex = 0; testIndex < 5; testIndex++) {
+        for (int testIndex = 0; testIndex < currentOffsetData[0].length; testIndex++) {
             for (int i = 0; i < currentShape.squareMatrix.length; i++) {
                 for (int j = 0; j < currentShape.squareMatrix[0].length; j++) {
                     if (currentShape.squareMatrix[i][j].getColor() != null) {
@@ -236,16 +205,56 @@ public class Board  extends JPanel implements KeyListener {
                     }
                 }
             }
-            if (!checkIfShapeHasNeighbour(tempShape, 3) && !checkIfShapeHasNeighbour(tempShape, 4) && !checkIfShapeHasNeighbour(tempShape, 2)) {
-                for (int i = 0; i < currentShape.squareMatrix.length; i++) {
-                    for (int j = 0; j < currentShape.squareMatrix[0].length; j++) {
-                        if (currentShape.squareMatrix[i][j].getColor() != null) {
-                            currentShape.squareMatrix[i][j].setX(tempShape.squareMatrix[i][j].getX());
-                            currentShape.squareMatrix[i][j].setY(tempShape.squareMatrix[i][j].getY());
-                        }
-                    }
-                }
+            if (isRotationValid(tempShape)) {
+                updateCurrentShapeCoordinates(tempShape);
                 return;
+            }
+        }
+    }
+
+    private int[] getCenterCoordinates(Shape shape) {
+        final int row = Integer.parseInt(shape.getCenterPoint().substring(0, 1));
+        final int col = Integer.parseInt(shape.getCenterPoint().substring(1));
+        final int globalX = shape.squareMatrix[row][col].getX();
+        final int globalY = shape.squareMatrix[row][col].getY();
+        return new int[]{globalX, globalY};
+    }
+
+    private int getNewRotationIndex(boolean direction, int oldRotationIndex) {
+        if (direction) {
+            return (oldRotationIndex == 3) ? 0 : oldRotationIndex + 1;
+        } else {
+            return (oldRotationIndex == 0) ? 3 : oldRotationIndex - 1;
+        }
+    }
+
+    private Square[][] getCurrentOffsetData(ShapeType shapeType) {
+        return switch (shapeType) {
+            case O_Shape -> Shape.getOOffsetData();
+            case I_Shape -> Shape.getIOffsetData();
+            default -> Shape.getJLSTZOffsetData();
+        };
+    }
+
+    private Shape createTemporaryShape(Shape currentShape) {
+        Shape tempShape = new Shape(currentShape.getShapeType(), currentShape.getRotationIndex());
+        tempShape.setCenterPoint(currentShape.getCenterPoint());
+        return tempShape;
+    }
+
+    private boolean isRotationValid(Shape tempShape) {
+        return !checkIfShapeHasNeighbour(tempShape, 3) &&
+        !checkIfShapeHasNeighbour(tempShape, 4) &&
+        !checkIfShapeHasNeighbour(tempShape, 2);
+    }
+
+    private void updateCurrentShapeCoordinates(Shape tempShape) {
+        for (int i = 0; i < currentShape.squareMatrix.length; i++) {
+            for (int j = 0; j < currentShape.squareMatrix[0].length; j++) {
+                if (currentShape.squareMatrix[i][j].getColor() != null) {
+                    currentShape.squareMatrix[i][j].setX(tempShape.squareMatrix[i][j].getX());
+                    currentShape.squareMatrix[i][j].setY(tempShape.squareMatrix[i][j].getY());
+                }
             }
         }
     }
