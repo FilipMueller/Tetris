@@ -1,4 +1,8 @@
+import com.sun.jdi.ThreadGroupReference;
+
 import java.awt.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Shape {
 
@@ -106,6 +110,17 @@ public class Shape {
         initialSpawn = false;
     }
 
+    public void drawLandingLocation(Graphics g) {
+        for (int row = 0; row < squareMatrix.length; row++) {
+            for (int col = 0; col < squareMatrix[0].length; col++) {
+                if (squareMatrix[row][col].getColor() != null) {
+                    g.setColor(squareMatrix[row][col].getColor());
+                    g.fillRect(squareMatrix[row][col].getX() * BLOCK_SIZE, squareMatrix[row][col].getY() * BLOCK_SIZE,BLOCK_SIZE, BLOCK_SIZE);
+                }
+            }
+        }
+    }
+
     public void moveDown() {
         for (int i = 0; i < squareMatrix.length; i++) {
             for (int j = 0; j < squareMatrix[0].length; j++) {
@@ -134,6 +149,41 @@ public class Shape {
                 }
             }
         }
+    }
+
+    public int getLowestY(int x) {
+        int lowestY = 0;
+        for (Square[] squareArray : squareMatrix) {
+            for (Square square : squareArray) {
+                if (square != null && square.getX() == x) {
+                    int currentY = square.getY();
+                    if (currentY > lowestY) {
+                        lowestY = currentY;
+                    }
+                }
+            }
+        }
+        return lowestY;
+    }
+
+    public int[] getXCoordinates() {
+        Set<Integer> xCoordinatesSet = new HashSet<>();
+
+        for (Square[] squareArray : squareMatrix) {
+            for (Square square : squareArray) {
+                if (square.getColor() != null) {
+                    xCoordinatesSet.add(square.getX());
+                }
+            }
+        }
+
+        int[] xCoordinates = new int[xCoordinatesSet.size()];
+        int index = 0;
+        for (int x : xCoordinatesSet) {
+            xCoordinates[index++] = x;
+        }
+
+        return xCoordinates;
     }
 
     public Square[][] getSquareMatrix() {

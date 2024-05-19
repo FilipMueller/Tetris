@@ -106,6 +106,7 @@ public class Board  extends JPanel implements KeyListener {
         checkIfBoardHasFilledRow();
         drawBoard(g);
         currentShape.draw(g);
+        drawLandingLocation(g);
         drawGameField(g);
 
         if (pause) {
@@ -359,6 +360,37 @@ public class Board  extends JPanel implements KeyListener {
                 }
             }
         }
+    }
+
+    private void drawLandingLocation(Graphics g) {
+        int[] xCoordinates = currentShape.getXCoordinates();
+        int length = xCoordinates.length - 1;
+        for (int y = 0; y < board.length; y++) {
+            for (int x = xCoordinates[0]; x <= xCoordinates[length]; x++) {
+                if (board[y][x] != null || y == 19) {
+                    int newBottom = (y - 1) - currentShape.getLowestY(x);
+                    if (y == 19) {
+                        newBottom += 1;
+                    }
+                    Shape landingLocation = createLandingLocationShape(newBottom);
+                    landingLocation.drawLandingLocation(g);
+                    return;
+                }
+            }
+        }
+    }
+
+    private Shape createLandingLocationShape(int newBottom) {
+        Shape tempShape = createTemporaryShape(currentShape);
+        for (int i = 0; i < currentShape.squareMatrix.length; i++) {
+            for (int j = 0; j < currentShape.squareMatrix[0].length; j++) {
+                if (tempShape.squareMatrix[i][j].getColor() != null) {
+                    tempShape.squareMatrix[i][j].setX(currentShape.squareMatrix[i][j].getX());
+                    tempShape.squareMatrix[i][j].setY(currentShape.squareMatrix[i][j].getY() + newBottom);
+                }
+            }
+        }
+        return tempShape;
     }
 
     private void fillBoard() {
