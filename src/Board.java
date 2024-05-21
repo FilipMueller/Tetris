@@ -42,6 +42,8 @@ public class Board  extends JPanel implements KeyListener {
 
     private Shape currentShape = new Shape();
 
+    private Shape nextShape = new Shape();
+
     private int paintBackground = 0;
 
     private final Timer looper;
@@ -80,8 +82,9 @@ public class Board  extends JPanel implements KeyListener {
         }
 
         if (checkIfShapeHasNeighbour(currentShape, 2)) {
-            fillBoard();
-            currentShape = new Shape();
+            fillBoardWithCurrentShape();
+            currentShape = new Shape(nextShape.getShapeType(), nextShape.getRotationIndex());
+            nextShape = new Shape();
             if (boardLimitReached()) {
                 gameover(g);
                 return;
@@ -102,10 +105,12 @@ public class Board  extends JPanel implements KeyListener {
         g.drawString(score + "", 315, 325);
         g.setFont(fontPauseKey);
         g.drawString( "'P' = pause", 315, 480);
+        g.drawString("next", 350, 25);
 
         checkIfBoardHasFilledRow();
         drawBoard(g);
         currentShape.draw(g);
+        nextShape.drawNext(g);
         createLandingLocationShape(g);
         drawGameField(g);
 
@@ -207,7 +212,7 @@ public class Board  extends JPanel implements KeyListener {
                 }
             }
             if (isRotationValid(tempShape)) {
-                updateCurrentShapeCoordinates(tempShape);
+                updateCurrentShape(tempShape);
                 return;
             }
         }
@@ -243,18 +248,18 @@ public class Board  extends JPanel implements KeyListener {
         return tempShape;
     }
 
-    private boolean isRotationValid(Shape tempShape) {
-        return !checkIfShapeHasNeighbour(tempShape, 3) &&
-        !checkIfShapeHasNeighbour(tempShape, 4) &&
-        !checkIfShapeHasNeighbour(tempShape, 2);
+    private boolean isRotationValid(Shape shape) {
+        return !checkIfShapeHasNeighbour(shape, 3) &&
+        !checkIfShapeHasNeighbour(shape, 4) &&
+        !checkIfShapeHasNeighbour(shape, 2);
     }
 
-    private void updateCurrentShapeCoordinates(Shape tempShape) {
+    private void updateCurrentShape(Shape shape) {
         for (int i = 0; i < currentShape.squareMatrix.length; i++) {
             for (int j = 0; j < currentShape.squareMatrix[0].length; j++) {
                 if (currentShape.squareMatrix[i][j].getColor() != null) {
-                    currentShape.squareMatrix[i][j].setX(tempShape.squareMatrix[i][j].getX());
-                    currentShape.squareMatrix[i][j].setY(tempShape.squareMatrix[i][j].getY());
+                    currentShape.squareMatrix[i][j].setX(shape.squareMatrix[i][j].getX());
+                    currentShape.squareMatrix[i][j].setY(shape.squareMatrix[i][j].getY());
                 }
             }
         }
@@ -380,7 +385,7 @@ public class Board  extends JPanel implements KeyListener {
         }
     }
 
-    private void fillBoard() {
+    private void fillBoardWithCurrentShape() {
         for (Square[] squareArray : currentShape.getSquareMatrix()) {
             for (Square square : squareArray) {
                 int x = square.getX();

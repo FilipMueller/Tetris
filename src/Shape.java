@@ -24,12 +24,14 @@ public class Shape {
         this.shapeType = shapeType;
         this.rotationIndex = currentRotation;
         squareMatrix = getSquareMatrix(shapeType);
+        initializeXY();
     }
 
     public Shape() {
         this.shapeType = ShapeType.values() [(int) (Math.random() * ShapeType.values().length)];
         this.rotationIndex = 0;
         squareMatrix = getSquareMatrix(shapeType);
+        initializeXY();
     }
 
     private Square[][] getSquareMatrix(ShapeType shapeType) {
@@ -88,22 +90,37 @@ public class Shape {
         return squareMatrix;
     }
 
+    private void initializeXY() {
+        for (int row = 0; row < squareMatrix.length; row++) {
+            for (int col = 0; col < squareMatrix[0].length; col++) {
+                if (squareMatrix[row][col].getColor() != null) {
+                    squareMatrix[row][col].setX(col + 4);
+                    squareMatrix[row][col].setY(row);
+                }
+            }
+        }
+    }
+
     public void draw(Graphics g) {
         for (int row = 0; row < squareMatrix.length; row++) {
             for (int col = 0; col < squareMatrix[0].length; col++) {
                 if (squareMatrix[row][col].getColor() != null) {
                     g.setColor(squareMatrix[row][col].getColor());
-                    if (initialSpawn) {
-                        squareMatrix[row][col].setX(col + 4);
-                        squareMatrix[row][col].setY(row);
-                    }
-                    if (!initialSpawn) {
-                        g.fillRect(squareMatrix[row][col].getX() * BLOCK_SIZE, squareMatrix[row][col].getY() * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-                    }
+                    g.fillRect(squareMatrix[row][col].getX() * BLOCK_SIZE, squareMatrix[row][col].getY() * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
                 }
             }
         }
-        initialSpawn = false;
+    }
+
+    public void drawNext(Graphics g) {
+        for (int row = 0; row < squareMatrix.length; row++) {
+            for (int col = 0; col < squareMatrix[0].length; col++) {
+                if (squareMatrix[row][col].getColor() != null) {
+                    g.setColor(squareMatrix[row][col].getColor());
+                    g.fillRect(squareMatrix[row][col].getX() * 15 + 280, squareMatrix[row][col].getY() * 15 + 40, 15, 15);
+                }
+            }
+        }
     }
 
     public void drawLandingLocation(Graphics g) {
