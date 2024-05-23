@@ -1,3 +1,6 @@
+import Database.DatabaseManager;
+import Database.ScoreCallback;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -48,6 +51,8 @@ public class Board  extends JPanel implements KeyListener {
 
     private final Timer looper;
 
+    private static final DatabaseManager helper = new DatabaseManager();
+
     public Board() {
         looper = new Timer(delay, _ -> {
             if (System.currentTimeMillis() - beginTime > delayTimeForMovement) {
@@ -92,14 +97,24 @@ public class Board  extends JPanel implements KeyListener {
             NORMAL--;
         }
 
-        if (HighScoreDBManager.loadHighScore() < score) {
-            HighScoreDBManager.saveHighScore(score);
+        int[] scoreFromDatabase = new int[1];
+        helper.readScores(new ScoreCallback() {
+            @Override
+            public void onScoreRead(int score) {
+                scoreFromDatabase[0] = score;
+            }
+        });
+
+        int highscore = scoreFromDatabase[0];
+
+        if (highscore < score) {
+            helper.writeScore(score);
         }
 
         g.setColor(Color.YELLOW);
         g.setFont(fontScore);
         g.drawString("Highscore", 315, 150);
-        g.drawString(HighScoreDBManager.loadHighScore() + "", 315, 175);
+        g.drawString(highscore + "", 315, 175);
         g.setColor(Color.WHITE);
         g.drawString("Score", 315, 300);
         g.drawString(score + "", 315, 325);
