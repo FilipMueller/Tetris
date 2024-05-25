@@ -1,0 +1,12 @@
+Database\DatabaseManager.class
+ShapeType.class
+WindowGame.class
+Board.class
+Database\DatabaseInitializer.class
+Shape$1.class
+Board$1.class
+Database\DatabaseManager$1.class
+Shape.class
+Database\UserAuthentication.class
+Square.class
+Database\ScoreCallback.class

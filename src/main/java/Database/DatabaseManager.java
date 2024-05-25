@@ -5,28 +5,38 @@ public class DatabaseManager {
 
     private final DatabaseReference databaseReference;
 
+    private int currentScore;
+
+    private final String userID = UserIdentifier.getUserId();
+
     public DatabaseManager() {
         databaseReference = FirebaseDatabase.getInstance().getReference("scores");
     }
 
     public void writeScore(int score) {
-        databaseReference.child("score").setValueAsync(score);
-
+        databaseReference.child(userID).setValueAsync(score);
     }
 
-    public void readScores(ScoreCallback callback) {
-        databaseReference.child("score").addListenerForSingleValueEvent(new ValueEventListener() {
+    public void readScores() {
+        databaseReference.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 int highscore = dataSnapshot.getValue(Integer.class);
-                callback.onScoreRead(highscore);
+                setCurrentScore(highscore);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 System.err.println("Error reading highest score: " + databaseError.getMessage());
-                callback.onScoreRead(-1); // or handle the error as you see fit
             }
         });
+    }
+
+    public int getCurrentScore() {
+        return currentScore;
+    }
+
+    private void setCurrentScore(int score) {
+        this.currentScore = score;
     }
 }

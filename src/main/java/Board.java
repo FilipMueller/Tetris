@@ -1,76 +1,35 @@
 import Database.DatabaseManager;
-import Database.ScoreCallback;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.Serializable;
 import java.util.Arrays;
 
 public class Board  extends JPanel implements KeyListener {
 
-    private static final int BOARD_WIDTH = 10;
-
-    private static final int BOARD_HEIGHT = 20;
-
-    private static final int BLOCK_SIZE = 30;
-
-    private static final int FPS = 60;
-
-    private static final int delay = 1000 / FPS;
-
-    private static int NORMAL = 700;
-
-    private static final int FAST = 40;
-
-    private final int[] xRotationCounterClockwise = {0, 1};
-
-    private final int[] yRotationCounterClockwise = {-1, 0};
-
-    private final int[] xRotationClockwise = {0, -1};
-
-    private final int[] yRotationClockwise = {1, 0};
-
-    private int delayTimeForMovement = NORMAL;
-
-    private long beginTime;
-
-    private int score = 0;
-
-    private boolean pause = false;
-
-    private boolean gameIsOver = false;
-
-    private final Square[][] board = new Square[BOARD_HEIGHT][BOARD_WIDTH];
-
-    private Shape currentShape = new Shape();
-
-    private Shape nextShape = new Shape();
-
-    private int paintBackground = 0;
-
-    private final Timer looper;
-
-    private static final DatabaseManager helper = new DatabaseManager();
+    private final Constants constants = new Constants();
 
     public Board() {
-        looper = new Timer(delay, _ -> {
-            if (System.currentTimeMillis() - beginTime > delayTimeForMovement) {
-                if (!checkIfShapeHasNeighbour(currentShape, 2) && !pause) currentShape.moveDown();
-                beginTime = System.currentTimeMillis();
+        constants.looper = new Timer(Constants.delay, _ -> {
+            if (System.currentTimeMillis() - constants.beginTime > constants.delayTimeForMovement) {
+                if (!checkIfShapeHasNeighbour(constants.currentShape, 2) && !constants.pause)
+                    constants.currentShape.moveDown();
+                constants.beginTime = System.currentTimeMillis();
             }
-            if (!pause) {
-                paintBackground = 0;
+            if (!constants.pause) {
+                constants.paintBackground = 0;
                 repaint();
             }
 
-            if (pause && paintBackground == 0) {
+            if (constants.pause && constants.paintBackground == 0) {
                 repaint();
-                paintBackground = 1;
+                constants.paintBackground = 1;
             }
 
         });
-        looper.start();
+        constants.looper.start();
     }
 
     @Override
@@ -81,34 +40,27 @@ public class Board  extends JPanel implements KeyListener {
         Font fontPause = new Font("fontPause", Font.BOLD, 50);
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, getWidth(), getHeight());
-        if (pause) {
+        if (constants.pause) {
             g.setColor(Color.LIGHT_GRAY);
             g.fillRect(0, 0, 300, 600);
         }
 
-        if (checkIfShapeHasNeighbour(currentShape, 2)) {
+        if (checkIfShapeHasNeighbour(constants.currentShape, 2)) {
             fillBoardWithCurrentShape();
-            currentShape = new Shape(nextShape.getShapeType(), nextShape.getRotationIndex());
-            nextShape = new Shape();
+            constants.currentShape = new Shape(constants.nextShape.getShapeType(), constants.nextShape.getRotationIndex());
+            constants.nextShape = new Shape();
             if (boardLimitReached()) {
                 gameover(g);
                 return;
             }
-            NORMAL--;
+            Constants.NORMAL--;
         }
 
-        int[] scoreFromDatabase = new int[1];
-        helper.readScores(new ScoreCallback() {
-            @Override
-            public void onScoreRead(int score) {
-                scoreFromDatabase[0] = score;
-            }
-        });
+        Constants.helper.readScores();
+        int highscore = Constants.helper.getCurrentScore();
 
-        int highscore = scoreFromDatabase[0];
-
-        if (highscore < score) {
-            helper.writeScore(score);
+        if (highscore < constants.score) {
+            Constants.helper.writeScore(constants.score);
         }
 
         g.setColor(Color.YELLOW);
@@ -117,19 +69,19 @@ public class Board  extends JPanel implements KeyListener {
         g.drawString(highscore + "", 315, 175);
         g.setColor(Color.WHITE);
         g.drawString("Score", 315, 300);
-        g.drawString(score + "", 315, 325);
+        g.drawString(constants.score + "", 315, 325);
         g.setFont(fontPauseKey);
         g.drawString( "'P' = pause", 315, 480);
         g.drawString("next", 350, 25);
 
         checkIfBoardHasFilledRow();
         drawBoard(g);
-        currentShape.draw(g);
-        nextShape.drawNext(g);
+        constants.currentShape.draw(g);
+        constants.nextShape.drawNext(g);
         createLandingLocationShape(g);
         drawGameField(g);
 
-        if (pause) {
+        if (constants.pause) {
             g.setColor(Color.RED);
             g.setFont(fontPause);
             g.drawString("PAUSED", 48, 280);
@@ -137,9 +89,9 @@ public class Board  extends JPanel implements KeyListener {
     }
 
     private void gameover(Graphics g) {
-        gameIsOver = true;
-        score = 0;
-        looper.stop();
+        constants.gameIsOver = true;
+        constants.score = 0;
+        constants.looper.stop();
         drawGameField(g);
         drawBoard(g);
         Font font = new Font("font", Font.BOLD, 50);
@@ -154,12 +106,12 @@ public class Board  extends JPanel implements KeyListener {
         g.drawString("GAME OVER", 50, 280);
         g.setFont(fontTwo);
         g.setColor(Color.BLACK);
-        g.drawString(score + "", 160, 324);
-        g.drawString(score + "", 159, 325);
-        g.drawString(score + "", 160, 326);
-        g.drawString(score + "", 161, 325);
+        g.drawString(constants.score + "", 160, 324);
+        g.drawString(constants.score + "", 159, 325);
+        g.drawString(constants.score + "", 160, 326);
+        g.drawString(constants.score + "", 161, 325);
         g.setColor(Color.YELLOW);
-        g.drawString(score + "", 160, 325);
+        g.drawString(constants.score + "", 160, 325);
         g.setColor(Color.BLACK);
         g.drawString( "'R' = Restart", 80, 359);
         g.drawString( "'R' = Restart", 79, 360);
@@ -171,41 +123,41 @@ public class Board  extends JPanel implements KeyListener {
 
     private void drawGameField(Graphics g) {
         g.setColor(Color.WHITE);
-        for (int row = 0; row < BOARD_HEIGHT; row++) {
-            g.drawLine(0, BLOCK_SIZE * row, BLOCK_SIZE * BOARD_WIDTH, BLOCK_SIZE * row);
+        for (int row = 0; row < Constants.BOARD_HEIGHT; row++) {
+            g.drawLine(0, Constants.BLOCK_SIZE * row, Constants.BLOCK_SIZE * Constants.BOARD_WIDTH, Constants.BLOCK_SIZE * row);
         }
-        for (int column = 0; column < BOARD_WIDTH + 1; column++) {
-            g.drawLine(column * BLOCK_SIZE, 0, column * BLOCK_SIZE, BLOCK_SIZE * BOARD_HEIGHT);
+        for (int column = 0; column < Constants.BOARD_WIDTH + 1; column++) {
+            g.drawLine(column * Constants.BLOCK_SIZE, 0, column * Constants.BLOCK_SIZE, Constants.BLOCK_SIZE * Constants.BOARD_HEIGHT);
         }
     }
 
     private void rotate(boolean direction) {
-        final int[] centerCoords = getCenterCoordinates(currentShape);
+        final int[] centerCoords = getCenterCoordinates(constants.currentShape);
         final int globalX = centerCoords[0];
         final int globalY = centerCoords[1];
 
-        final int oldRotationIndex = currentShape.getRotationIndex();
+        final int oldRotationIndex = constants.currentShape.getRotationIndex();
         final int newRotationIndex = getNewRotationIndex(direction, oldRotationIndex);
-        currentShape.setRotationIndex(newRotationIndex);
+        constants.currentShape.setRotationIndex(newRotationIndex);
 
-        final Square[][] currentOffsetData = getCurrentOffsetData(currentShape.getShapeType());
-        Shape tempShape = createTemporaryShape(currentShape);
+        final Square[][] currentOffsetData = getCurrentOffsetData(constants.currentShape.getShapeType());
+        Shape tempShape = createTemporaryShape(constants.currentShape);
 
         for (int testIndex = 0; testIndex < currentOffsetData[0].length; testIndex++) {
-            for (int i = 0; i < currentShape.squareMatrix.length; i++) {
-                for (int j = 0; j < currentShape.squareMatrix[0].length; j++) {
-                    if (currentShape.squareMatrix[i][j].getColor() != null) {
-                        final int relativeX = currentShape.squareMatrix[i][j].getX() - globalX;
-                        final int relativeY = currentShape.squareMatrix[i][j].getY() - globalY;
+            for (int i = 0; i < constants.currentShape.squareMatrix.length; i++) {
+                for (int j = 0; j < constants.currentShape.squareMatrix[0].length; j++) {
+                    if (constants.currentShape.squareMatrix[i][j].getColor() != null) {
+                        final int relativeX = constants.currentShape.squareMatrix[i][j].getX() - globalX;
+                        final int relativeY = constants.currentShape.squareMatrix[i][j].getY() - globalY;
                         final int newX;
                         final int newY;
 
                         if (direction) {
-                            newX = (xRotationClockwise[0] * relativeX) + (xRotationClockwise[1] * relativeY);
-                            newY = (yRotationClockwise[0] * relativeX) + (yRotationClockwise[1] * relativeY);
+                            newX = (constants.xRotationClockwise[0] * relativeX) + (constants.xRotationClockwise[1] * relativeY);
+                            newY = (constants.yRotationClockwise[0] * relativeX) + (constants.yRotationClockwise[1] * relativeY);
                         } else {
-                            newX = (xRotationCounterClockwise[0] * relativeX) + (xRotationCounterClockwise[1] * relativeY);
-                            newY = (yRotationCounterClockwise[0] * relativeX) + (yRotationCounterClockwise[1] * relativeY);
+                            newX = (constants.xRotationCounterClockwise[0] * relativeX) + (constants.xRotationCounterClockwise[1] * relativeY);
+                            newY = (constants.yRotationCounterClockwise[0] * relativeX) + (constants.yRotationCounterClockwise[1] * relativeY);
                         }
 
                         Square offset1 = currentOffsetData[oldRotationIndex][testIndex];
@@ -270,11 +222,11 @@ public class Board  extends JPanel implements KeyListener {
     }
 
     private void updateCurrentShape(Shape shape) {
-        for (int i = 0; i < currentShape.squareMatrix.length; i++) {
-            for (int j = 0; j < currentShape.squareMatrix[0].length; j++) {
-                if (currentShape.squareMatrix[i][j].getColor() != null) {
-                    currentShape.squareMatrix[i][j].setX(shape.squareMatrix[i][j].getX());
-                    currentShape.squareMatrix[i][j].setY(shape.squareMatrix[i][j].getY());
+        for (int i = 0; i < constants.currentShape.squareMatrix.length; i++) {
+            for (int j = 0; j < constants.currentShape.squareMatrix[0].length; j++) {
+                if (constants.currentShape.squareMatrix[i][j].getColor() != null) {
+                    constants.currentShape.squareMatrix[i][j].setX(shape.squareMatrix[i][j].getX());
+                    constants.currentShape.squareMatrix[i][j].setY(shape.squareMatrix[i][j].getY());
                 }
             }
         }
@@ -288,17 +240,17 @@ public class Board  extends JPanel implements KeyListener {
                     int y = square.getY();
                     switch (direction) {
                         case 0: //check right
-                            if (x >= 9 || board[y][x + 1] != null) {
+                            if (x >= 9 || constants.board[y][x + 1] != null) {
                                 return true;
                             }
                             break;
                         case 1: //check left
-                            if (x <= 0 || board[y][x - 1] != null) {
+                            if (x <= 0 || constants.board[y][x - 1] != null) {
                                 return true;
                             }
                             break;
                         case 2: //check bottom
-                            if (y >= 19 || board[y + 1][x] != null) {
+                            if (y >= 19 || constants.board[y + 1][x] != null) {
                                 return true;
                             }
                             break;
@@ -323,7 +275,7 @@ public class Board  extends JPanel implements KeyListener {
 
     private void checkIfBoardHasFilledRow() {
         int rowNumber = 0;
-        for (Square[] squareArray : board) {
+        for (Square[] squareArray : constants.board) {
             int filledSquares = 0;
             for (Square square : squareArray) {
                 if (square != null) {
@@ -339,18 +291,18 @@ public class Board  extends JPanel implements KeyListener {
 
     private void emptyFilledRow(int rowNumber) {
         for (int i = 0; i < 10; i++) {
-            board[rowNumber][i] = null;
+            constants.board[rowNumber][i] = null;
         }
 
-        score += 100;
+        constants.score = constants.score + 100;
 
         for (int i = rowNumber - 1; i >= 0; i--) {
             for (int j = 0; j < 10; j++) {
-                if (board[i][j] != null) {
-                    board[i + 1][j] = new Square(board[i][j].getColor());
-                    board[i + 1][j].setX(board[i][j].getX());
-                    board[i + 1][j].setY(board[i][j].getY() + 1);
-                    board[i][j] = null;
+                if (constants.board[i][j] != null) {
+                    constants.board[i + 1][j] = new Square(constants.board[i][j].getColor());
+                    constants.board[i + 1][j].setX(constants.board[i][j].getX());
+                    constants.board[i + 1][j].setY(constants.board[i][j].getY() + 1);
+                    constants.board[i][j] = null;
                 }
             }
         }
@@ -358,7 +310,7 @@ public class Board  extends JPanel implements KeyListener {
 
     private boolean boardLimitReached() {
         for (int i = 3; i < 7; i++) {
-            if (board[0][i] != null) {
+            if (constants.board[0][i] != null) {
                 return true;
             }
         }
@@ -366,30 +318,30 @@ public class Board  extends JPanel implements KeyListener {
     }
 
     private void resetBoard() {
-        for (Square[] squares : board) {
+        for (Square[] squares : constants.board) {
             Arrays.fill(squares, null);
         }
     }
 
     private void drawBoard(Graphics g) {
-        for (int row = 0; row < board.length; row++) {
-            for (int col = 0; col < board[0].length; col++) {
-                if (board[row][col] != null) {
-                    g.setColor(board[row][col].getColor());
-                    g.fillRect(board[row][col].getX() * BLOCK_SIZE, board[row][col].getY() * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+        for (int row = 0; row < constants.board.length; row++) {
+            for (int col = 0; col < constants.board[0].length; col++) {
+                if (constants.board[row][col] != null) {
+                    g.setColor(constants.board[row][col].getColor());
+                    g.fillRect(constants.board[row][col].getX() * Constants.BLOCK_SIZE, constants.board[row][col].getY() * Constants.BLOCK_SIZE, Constants.BLOCK_SIZE, Constants.BLOCK_SIZE);
                 }
             }
         }
     }
 
     private void createLandingLocationShape(Graphics g) {
-        Shape tempShape = createTemporaryShape(currentShape);
-        for (int y = 1; y < board.length; y++) {
-            for (int i = 0; i < currentShape.squareMatrix.length; i++) {
-                for (int j = 0; j < currentShape.squareMatrix[0].length; j++) {
+        Shape tempShape = createTemporaryShape(constants.currentShape);
+        for (int y = 1; y < constants.board.length; y++) {
+            for (int i = 0; i < constants.currentShape.squareMatrix.length; i++) {
+                for (int j = 0; j < constants.currentShape.squareMatrix[0].length; j++) {
                     if (tempShape.squareMatrix[i][j].getColor() != null) {
-                        tempShape.squareMatrix[i][j].setX(currentShape.squareMatrix[i][j].getX());
-                        tempShape.squareMatrix[i][j].setY(currentShape.squareMatrix[i][j].getY() + y);
+                        tempShape.squareMatrix[i][j].setX(constants.currentShape.squareMatrix[i][j].getX());
+                        tempShape.squareMatrix[i][j].setY(constants.currentShape.squareMatrix[i][j].getY() + y);
                     }
                 }
             }
@@ -401,14 +353,14 @@ public class Board  extends JPanel implements KeyListener {
     }
 
     private void fillBoardWithCurrentShape() {
-        for (Square[] squareArray : currentShape.getSquareMatrix()) {
+        for (Square[] squareArray : constants.currentShape.getSquareMatrix()) {
             for (Square square : squareArray) {
                 int x = square.getX();
                 int y = square.getY();
                 if (square.getColor() != null) {
-                    board[y][x] = new Square(square.getColor());
-                    board[y][x].setX(x);
-                    board[y][x].setY(y);
+                    constants.board[y][x] = new Square(square.getColor());
+                    constants.board[y][x].setX(x);
+                    constants.board[y][x].setY(y);
                 }
             }
         }
@@ -422,41 +374,69 @@ public class Board  extends JPanel implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_Q && !pause) {
+        if (e.getKeyCode() == KeyEvent.VK_Q && !constants.pause) {
             rotate(false);
         }
-        if (e.getKeyCode() == KeyEvent.VK_E && !pause) {
+        if (e.getKeyCode() == KeyEvent.VK_E && !constants.pause) {
             rotate(true);
         }
-        if (e.getKeyCode() == KeyEvent.VK_A && !checkIfShapeHasNeighbour(currentShape, 1) && !pause) {
-            currentShape.moveLeft();
+        if (e.getKeyCode() == KeyEvent.VK_A && !checkIfShapeHasNeighbour(constants.currentShape, 1) && !constants.pause) {
+            constants.currentShape.moveLeft();
         }
-        if (e.getKeyCode() == KeyEvent.VK_D && !checkIfShapeHasNeighbour(currentShape, 0) && !pause) {
-            currentShape.moveRight();
+        if (e.getKeyCode() == KeyEvent.VK_D && !checkIfShapeHasNeighbour(constants.currentShape, 0) && !constants.pause) {
+            constants.currentShape.moveRight();
         }
-        if (e.getKeyCode() == KeyEvent.VK_S && !checkIfShapeHasNeighbour(currentShape, 2) && !pause) {
-            delayTimeForMovement = FAST;
+        if (e.getKeyCode() == KeyEvent.VK_S && !checkIfShapeHasNeighbour(constants.currentShape, 2) && !constants.pause) {
+            constants.delayTimeForMovement = Constants.FAST;
         }
         if (e.getKeyCode() == KeyEvent.VK_P) {
-            pause = !pause;
+            constants.pause = !constants.pause;
         }
-        if (e.getKeyCode() == KeyEvent.VK_R && gameIsOver) {
+        if (e.getKeyCode() == KeyEvent.VK_R && constants.gameIsOver) {
             resetBoard();
-            looper.start();
-            NORMAL = 700;
+            constants.looper.start();
+            Constants.NORMAL = 700;
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_A) {
-            delayTimeForMovement = NORMAL;
+            constants.delayTimeForMovement = Constants.NORMAL;
         }
         if (e.getKeyCode() == KeyEvent.VK_D) {
-            delayTimeForMovement = NORMAL;
+            constants.delayTimeForMovement = Constants.NORMAL;
         }
         if (e.getKeyCode() == KeyEvent.VK_S) {
-            delayTimeForMovement = NORMAL;
+            constants.delayTimeForMovement = Constants.NORMAL;
+        }
+    }
+
+    public class Constants {
+        static final int BOARD_WIDTH = 10;
+        static final int BOARD_HEIGHT = 20;
+        static final int BLOCK_SIZE = 30;
+        static final int FPS = 60;
+        static final int delay = 1000 / FPS;
+        static int NORMAL = 700;
+        static final int FAST = 40;
+        final int[] xRotationCounterClockwise = {0, 1};
+        final int[] yRotationCounterClockwise = {-1, 0};
+        final int[] xRotationClockwise = {0, -1};
+        final int[] yRotationClockwise = {1, 0};
+        int delayTimeForMovement = NORMAL;
+        long beginTime;
+        int score = 0;
+        boolean pause = false;
+        boolean gameIsOver = false;
+        final Square[][] board = new Square[BOARD_HEIGHT][BOARD_WIDTH];
+        Shape currentShape = new Shape();
+        Shape nextShape = new Shape();
+        int paintBackground = 0;
+        Timer looper;
+        static final DatabaseManager helper = new DatabaseManager();
+
+        public Constants() {
         }
     }
 }
