@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.Serializable;
 import java.util.Arrays;
 
 public class Board  extends JPanel implements KeyListener {
@@ -35,103 +34,49 @@ public class Board  extends JPanel implements KeyListener {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Font fontScore = new Font("fontScore", Font.PLAIN, 20);
-        Font fontPauseKey = new Font("fontPauseKey", Font.PLAIN, 16);
-        Font fontPause = new Font("fontPause", Font.BOLD, 50);
-        g.setColor(Color.BLACK);
-        g.fillRect(0, 0, getWidth(), getHeight());
-        if (constants.pause) {
-            g.setColor(Color.LIGHT_GRAY);
-            g.fillRect(0, 0, 300, 600);
-        }
+        constants.boardGraphics.drawBackGround(g);
 
         if (checkIfShapeHasNeighbour(constants.currentShape, 2)) {
             fillBoardWithCurrentShape();
             constants.currentShape = new Shape(constants.nextShape.getShapeType(), constants.nextShape.getRotationIndex());
             constants.nextShape = new Shape();
             if (boardLimitReached()) {
-                gameover(g);
+                gameOver(g);
                 return;
             }
             Constants.NORMAL--;
         }
 
-        Constants.helper.readScores();
-        int highscore = Constants.helper.getCurrentScore();
-
+        Constants.firebase.readScores();
+        int highscore = Constants.firebase.getCurrentScore();
         if (highscore < constants.score) {
-            Constants.helper.writeScore(constants.score);
+            Constants.firebase.writeScore(constants.score);
         }
 
-        g.setColor(Color.YELLOW);
-        g.setFont(fontScore);
-        g.drawString("Highscore", 315, 150);
-        g.drawString(highscore + "", 315, 175);
-        g.setColor(Color.WHITE);
-        g.drawString("Score", 315, 300);
-        g.drawString(constants.score + "", 315, 325);
-        g.setFont(fontPauseKey);
-        g.drawString( "'P' = pause", 315, 480);
-        g.drawString("next", 350, 25);
-
+        constants.boardGraphics.drawSideInfo(g, highscore, constants.score);
         checkIfBoardHasFilledRow();
-        drawBoard(g);
+        constants.boardGraphics.drawBoard(g, constants.board);
         constants.currentShape.draw(g);
         constants.nextShape.drawNext(g);
         createLandingLocationShape(g);
-        drawGameField(g);
+        constants.boardGraphics.drawGameField(g);
 
         if (constants.pause) {
-            g.setColor(Color.RED);
-            g.setFont(fontPause);
-            g.drawString("PAUSED", 48, 280);
+            constants.boardGraphics.drawPauseScreen(g, constants.board, constants.currentShape);
         }
     }
 
-    private void gameover(Graphics g) {
+    private void gameOver(Graphics g) {
         constants.gameIsOver = true;
-        constants.score = 0;
         constants.looper.stop();
-        drawGameField(g);
-        drawBoard(g);
-        Font font = new Font("font", Font.BOLD, 50);
-        Font fontTwo = new Font("font2", Font.ITALIC, 45);
-        g.setColor(Color.BLACK);
-        g.setFont(font);
-        g.drawString("GAME OVER", 50, 279);
-        g.drawString("GAME OVER", 49, 280);
-        g.drawString("GAME OVER", 50, 281);
-        g.drawString("GAME OVER", 51, 280);
-        g.setColor(Color.RED);
-        g.drawString("GAME OVER", 50, 280);
-        g.setFont(fontTwo);
-        g.setColor(Color.BLACK);
-        g.drawString(constants.score + "", 160, 324);
-        g.drawString(constants.score + "", 159, 325);
-        g.drawString(constants.score + "", 160, 326);
-        g.drawString(constants.score + "", 161, 325);
-        g.setColor(Color.YELLOW);
-        g.drawString(constants.score + "", 160, 325);
-        g.setColor(Color.BLACK);
-        g.drawString( "'R' = Restart", 80, 359);
-        g.drawString( "'R' = Restart", 79, 360);
-        g.drawString( "'R' = Restart", 80, 361);
-        g.drawString( "'R' = Restart", 81, 360);
-        g.setColor(Color.YELLOW);
-        g.drawString( "'R' = Restart", 80, 360);
+        constants.boardGraphics.drawGameField(g);
+        constants.boardGraphics.drawBoard(g, constants.board);
+        constants.boardGraphics.drawGameOverScreen(g, constants.score);
+        constants.score = 0;
     }
 
-    private void drawGameField(Graphics g) {
-        g.setColor(Color.WHITE);
-        for (int row = 0; row < Constants.BOARD_HEIGHT; row++) {
-            g.drawLine(0, Constants.BLOCK_SIZE * row, Constants.BLOCK_SIZE * Constants.BOARD_WIDTH, Constants.BLOCK_SIZE * row);
-        }
-        for (int column = 0; column < Constants.BOARD_WIDTH + 1; column++) {
-            g.drawLine(column * Constants.BLOCK_SIZE, 0, column * Constants.BLOCK_SIZE, Constants.BLOCK_SIZE * Constants.BOARD_HEIGHT);
-        }
-    }
 
-    private void rotate(boolean direction) {
+    private void rotateShape(boolean direction) {
         final int[] centerCoords = getCenterCoordinates(constants.currentShape);
         final int globalX = centerCoords[0];
         final int globalY = centerCoords[1];
@@ -323,17 +268,6 @@ public class Board  extends JPanel implements KeyListener {
         }
     }
 
-    private void drawBoard(Graphics g) {
-        for (int row = 0; row < constants.board.length; row++) {
-            for (int col = 0; col < constants.board[0].length; col++) {
-                if (constants.board[row][col] != null) {
-                    g.setColor(constants.board[row][col].getColor());
-                    g.fillRect(constants.board[row][col].getX() * Constants.BLOCK_SIZE, constants.board[row][col].getY() * Constants.BLOCK_SIZE, Constants.BLOCK_SIZE, Constants.BLOCK_SIZE);
-                }
-            }
-        }
-    }
-
     private void createLandingLocationShape(Graphics g) {
         Shape tempShape = createTemporaryShape(constants.currentShape);
         for (int y = 1; y < constants.board.length; y++) {
@@ -375,10 +309,10 @@ public class Board  extends JPanel implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_Q && !constants.pause) {
-            rotate(false);
+            rotateShape(false);
         }
         if (e.getKeyCode() == KeyEvent.VK_E && !constants.pause) {
-            rotate(true);
+            rotateShape(true);
         }
         if (e.getKeyCode() == KeyEvent.VK_A && !checkIfShapeHasNeighbour(constants.currentShape, 1) && !constants.pause) {
             constants.currentShape.moveLeft();
@@ -434,7 +368,8 @@ public class Board  extends JPanel implements KeyListener {
         Shape nextShape = new Shape();
         int paintBackground = 0;
         Timer looper;
-        static final DatabaseManager helper = new DatabaseManager();
+        static final DatabaseManager firebase = new DatabaseManager();
+        final BoardGraphics boardGraphics = new BoardGraphics();
 
         public Constants() {
         }

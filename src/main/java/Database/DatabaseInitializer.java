@@ -5,7 +5,8 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
 import javax.annotation.PostConstruct;
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 public class DatabaseInitializer {
 
@@ -13,11 +14,13 @@ public class DatabaseInitializer {
 
     }
 
-
     @PostConstruct
     public void initialize() {
-        try {
-            FileInputStream serviceAccount = new FileInputStream("serviceAccountKey.json");
+        try (InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("serviceAccountKey.json")) {
+
+            if (serviceAccount == null) {
+                throw new FileNotFoundException("Resource not found: Database/serviceAccountKey.json");
+            }
 
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
